@@ -1,7 +1,9 @@
-export default function Home() {
+import { SignUp } from "@clerk/nextjs"
+
+export default function SignUpPage() {
   return (
     <main className="flex justify-center items-center min-h-screen">
-      <h1 className="text-2xl font-bold">Groovy Payments</h1>
+      <SignUp />
     </main>
   )
 }
