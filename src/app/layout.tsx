@@ -1,17 +1,7 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
+import { cormorant, syne, dmSans } from "@/app/ui/fonts";
 import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   title: "Groovy Payments",
@@ -27,7 +17,7 @@ export default function RootLayout({
     <ClerkProvider>
       <html
         lang="es"
-        className={`${geistSans.variable} ${geistMono.variable} h-full`}
+        className={`${cormorant.variable} ${syne.variable} ${dmSans.variable} h-full`}
       >
         <body className="min-h-full flex flex-col bg-background text-foreground">
           <nav className="bg-primary px-8 py-4 flex items-center justify-between">
