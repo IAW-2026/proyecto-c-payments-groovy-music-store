@@ -1,0 +1,46 @@
+type SearchParams = {
+  external_reference?: string
+  payment_type?: string
+}
+
+export default async function PagoExitosoPage({
+  searchParams,
+}: {
+  searchParams: Promise<SearchParams>
+}) {
+  const sp = await searchParams
+  const transaccionId = sp.external_reference
+
+  return (
+    <main className="min-h-screen bg-background flex items-center justify-center p-8">
+      <div className="max-w-md w-full bg-card rounded-lg border border-border p-8 text-center">
+
+        <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-emerald-100 text-emerald-700 mb-6">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+          </svg>
+        </div>
+
+        <h1 className="text-2xl font-bold text-foreground mb-2">
+          ¡Pago aprobado!
+        </h1>
+        <p className="text-muted mb-6">
+          Tu pago fue procesado correctamente. En breve recibirás la confirmación.
+        </p>
+
+        {transaccionId && (
+          <p className="text-xs text-muted font-mono bg-background rounded-md border border-border px-3 py-2 mb-6">
+            Transacción: {transaccionId}
+          </p>
+        )}
+
+        <a
+          href="/"
+          className="inline-block px-4 py-2 rounded-md bg-primary text-white text-sm font-medium hover:bg-primary/90 transition-colors"
+        >
+          Volver al inicio
+        </a>
+      </div>
+    </main>
+  )
+}
