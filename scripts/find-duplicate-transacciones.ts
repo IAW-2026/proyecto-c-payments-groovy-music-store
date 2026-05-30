@@ -3,8 +3,8 @@ import { PrismaClient } from "@prisma/client"
 const prisma = new PrismaClient()
 
 type TransRec = {
-  id: number
-  order_id: number
+  id: string
+  order_id: string
   buyer_id: string
   seller_id: string
   monto_total: number
@@ -17,7 +17,7 @@ async function main() {
   const rows = await prisma.transaccion.findMany({ orderBy: { id: "asc" } })
   const records = rows as unknown as TransRec[]
 
-  const map = new Map<number, TransRec[]>()
+  const map = new Map<string, TransRec[]>()
   for (const r of records) {
     const arr = map.get(r.order_id) ?? []
     arr.push(r)
@@ -41,7 +41,7 @@ async function main() {
   }
 
   console.log("\nPlan sugerido (mantener la última por id, borrar el resto):")
-  const deletionPlan: { order_id: number; keepId: number; deleteIds: number[] }[] = []
+  const deletionPlan: { order_id: string; keepId: string; deleteIds: string[] }[] = []
   for (const [order_id, arr] of duplicates) {
     const keep = arr[arr.length - 1]
     const deleteIds = arr.filter((r) => r.id !== keep.id).map((r) => r.id)

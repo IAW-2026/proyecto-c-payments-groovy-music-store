@@ -3,95 +3,88 @@
 import React, { useState, useRef, useEffect } from "react"
 import { useRouter, usePathname, useSearchParams } from "next/navigation"
 
-export default function Buscador() {
+type Props = {
+  params: {
+    query: string
+    buyerId: string
+    sellerId: string
+    estado?: string
+  }
+  placeholder?: string
+  estadoOpciones?: readonly string[]
+}
+
+export default function Buscador({ params, placeholder, estadoOpciones }: Props) {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
-  // Estado local para los inputs (para el debounce)
-  const [query, setQuery] = useState(searchParams?.get("query") ?? "")
-  const [buyerId, setBuyerId] = useState(searchParams?.get("buyerId") ?? "")
-  const [sellerId, setSellerId] = useState(searchParams?.get("sellerId") ?? "")
-  const [estado, setEstado] = useState(searchParams?.get("estado") ?? "")
+  const [query, setQuery]       = useState(searchParams?.get(params.query)   ?? "")
+  const [buyerId, setBuyerId]   = useState(searchParams?.get(params.buyerId) ?? "")
+  const [sellerId, setSellerId] = useState(searchParams?.get(params.sellerId) ?? "")
+  const [estado, setEstado]     = useState(params.estado ? (searchParams?.get(params.estado) ?? "") : "")
   const [mostrarAvanzados, setMostrarAvanzados] = useState(false)
 
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  // Función central que actualiza la URL
   const actualizarURL = (cambios: Record<string, string>) => {
     if (!pathname) return
-
-    const params = new URLSearchParams(searchParams?.toString() ?? "")
-
-    // Aplicar cambios
+    const urlParams = new URLSearchParams(searchParams?.toString() ?? "")
     Object.entries(cambios).forEach(([clave, valor]) => {
-      if (valor) {
-        params.set(clave, valor)
-      } else {
-        params.delete(clave)
-      }
+      if (valor) urlParams.set(clave, valor)
+      else urlParams.delete(clave)
     })
-
-    // Resetear paginación al cambiar filtros
-    params.set("pagina", "1")
-
-    const search = params.toString()
-    router.replace(`${pathname}${search ? `?${search}` : ""}`)
+    router.replace(`${pathname}${urlParams.toString() ? `?${urlParams.toString()}` : ""}`, { scroll: false })
   }
 
-  // Actualización con debounce para campos de texto
   const actualizarConDebounce = (clave: string, valor: string) => {
     if (debounceRef.current) clearTimeout(debounceRef.current)
-    debounceRef.current = setTimeout(() => {
-      actualizarURL({ [clave]: valor })
-    }, 300)
+    debounceRef.current = setTimeout(() => actualizarURL({ [clave]: valor }), 300)
   }
 
-  // Limpieza del timeout al desmontar
   useEffect(() => {
-    return () => {
-      if (debounceRef.current) clearTimeout(debounceRef.current)
-    }
+    return () => { if (debounceRef.current) clearTimeout(debounceRef.current) }
   }, [])
 
   const limpiarFiltros = () => {
-    setQuery("")
-    setBuyerId("")
-    setSellerId("")
-    setEstado("")
-    if (!pathname) return
-    router.replace(pathname)
+    setQuery(""); setBuyerId(""); setSellerId(""); setEstado("")
+    const vacios: Record<string, string> = {
+      [params.query]: "",
+      [params.buyerId]: "",
+      [params.sellerId]: "",
+    }
+    if (params.estado) vacios[params.estado] = ""
+    actualizarURL(vacios)
   }
 
   const hayFiltrosActivos = query || buyerId || sellerId || estado
 
   return (
     <div className="flex flex-col gap-3">
-      {/* Barra principal */}
       <div className="flex gap-2">
         <input
           type="text"
           value={query}
           onChange={(e) => {
             setQuery(e.target.value)
-            actualizarConDebounce("query", e.target.value)
+            actualizarConDebounce(params.query, e.target.value)
           }}
-          placeholder="Buscar por número de Transacción o de Orden"
+          placeholder={placeholder ?? "Buscar..."}
           className="flex-1 px-3 py-2 rounded-md border border-border bg-card text-foreground text-sm placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-primary"
         />
-
         <button
           type="button"
           onClick={() => {
             const abriendo = !mostrarAvanzados
             setMostrarAvanzados(abriendo)
-
-            // Si se está cerrando, limpiar los filtros avanzados de la URL
             if (!abriendo) {
-              setBuyerId("")
-              setSellerId("")
-              setEstado("")
-              actualizarURL({ buyerId: "", sellerId: "", estado: "" })
+              setBuyerId(""); setSellerId(""); setEstado("")
+              const vacios: Record<string, string> = {
+                [params.buyerId]: "",
+                [params.sellerId]: "",
+              }
+              if (params.estado) vacios[params.estado] = ""
+              actualizarURL(vacios)
             }
           }}
           className={`px-3 py-2 rounded-md border text-sm font-medium transition-colors ${
@@ -102,7 +95,6 @@ export default function Buscador() {
         >
           Filtros avanzados
         </button>
-
         {hayFiltrosActivos && (
           <button
             type="button"
@@ -114,7 +106,6 @@ export default function Buscador() {
         )}
       </div>
 
-      {/* Filtros avanzados (condicional) */}
       {mostrarAvanzados && (
         <div className="flex gap-2 flex-wrap">
           <input
@@ -122,38 +113,47 @@ export default function Buscador() {
             value={buyerId}
             onChange={(e) => {
               setBuyerId(e.target.value)
-              actualizarConDebounce("buyerId", e.target.value)
+              actualizarConDebounce(params.buyerId, e.target.value)
             }}
             placeholder="Buyer ID"
             className="flex-1 min-w-[150px] px-3 py-2 rounded-md border border-border bg-card text-foreground text-sm placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-primary"
           />
-
           <input
             type="text"
             value={sellerId}
             onChange={(e) => {
               setSellerId(e.target.value)
-              actualizarConDebounce("sellerId", e.target.value)
+              actualizarConDebounce(params.sellerId, e.target.value)
             }}
             placeholder="Seller ID"
             className="flex-1 min-w-[150px] px-3 py-2 rounded-md border border-border bg-card text-foreground text-sm placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-primary"
           />
-
-          <select
-            value={estado}
-            onChange={(e) => {
-              setEstado(e.target.value)
-              actualizarURL({ estado: e.target.value }) // sin debounce
-            }}
-            className="px-3 py-2 rounded-md border border-border bg-card text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-          >
-            <option value="">Todos los estados</option>
-            <option value="pendiente">Pendiente</option>
-            <option value="pagado">Pagado</option>
-            <option value="acreditado">Acreditado</option>
-            <option value="fallido">Fallido</option>
-            <option value="reembolsado">Reembolsado</option>
-          </select>
+          {params.estado && estadoOpciones && (
+            <div className="relative">
+              <select
+                value={estado}
+                onChange={(e) => {
+                  setEstado(e.target.value)
+                  actualizarURL({ [params.estado!]: e.target.value })
+                }}
+                className="appearance-none pl-3 pr-8 py-2 rounded-md border border-border bg-card text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+              >
+                <option value="">Todos los estados</option>
+                {estadoOpciones.map((opt) => (
+                  <option key={opt} value={opt}>{opt}</option>
+                ))}
+              </select>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06-.02L10 10.586l3.71-3.397a.75.75 0 011.02 1.098l-4.2 3.846a.75.75 0 01-1.02 0L5.25 8.29a.75.75 0 01-.02-1.08z" clipRule="evenodd" />
+              </svg>
+            </div>
+          )}
         </div>
       )}
     </div>

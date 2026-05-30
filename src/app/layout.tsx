@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
+import { SignOutButton } from "@clerk/nextjs"
 import { cormorant, syne, dmSans } from "@/app/ui/fonts";
 import "./globals.css";
 
@@ -24,6 +25,11 @@ export default function RootLayout({
             <span className="text-background font-bold text-lg">
               Groovy Payments
             </span>
+            <SignOutButton redirectUrl="/sign-in">
+              <button className="px-3 py-1.5 rounded-md bg-white/10 hover:bg-white/20 text-background text-sm font-medium transition-colors">
+                Cerrar sesión
+              </button>
+            </SignOutButton>
           </nav>
           {children}
           <footer className="bg-primary px-8 py-4 text-center text-background text-sm mt-auto">

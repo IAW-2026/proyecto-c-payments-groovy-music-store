@@ -8,8 +8,8 @@ datasource db {
 }
 
 model Transaccion {
-  id              Int            @id @default(autoincrement())
-  order_id        Int
+  id              String         @id @default(uuid())
+  order_id        String
   buyer_id        String
   seller_id       String
   monto_total     Float
@@ -23,8 +23,8 @@ model Transaccion {
 }
 
 model Pago {
-  id             Int         @id @default(autoincrement())
-  transaccion_id Int
+  id             String      @id @default(uuid())
+  transaccion_id String
   buyer_id       String
   monto          Float
   fecha          DateTime    @default(now())
@@ -34,8 +34,8 @@ model Pago {
 }
 
 model Acreditacion {
-  id             Int         @id @default(autoincrement())
-  transaccion_id Int
+  id             String      @id @default(uuid())
+  transaccion_id String
   seller_id      String
   monto          Float
   fecha          DateTime    @default(now())
@@ -45,9 +45,10 @@ model Acreditacion {
 }
 
 model Reclamo {
-  id                  Int         @id @default(autoincrement())
-  transaccion_id      Int
+  id                  String      @id @default(uuid())
+  transaccion_id      String
   motivo              String
+  descripcion         String?
   estado              String      @default("abierto")
   fecha_apertura      DateTime    @default(now())
   fecha_resolucion    DateTime?
