@@ -1,4 +1,4 @@
-import Link from "next/link"
+import { SignOutButton } from "@clerk/nextjs"
 
 export default function NoAutorizadoPage() {
   return (
@@ -11,12 +11,11 @@ export default function NoAutorizadoPage() {
         <p className="text-muted mb-8">
           Tu cuenta no tiene acceso a esta sección.
         </p>
-        <Link
-          href="/"
-          className="inline-block px-4 py-2 rounded-md bg-primary text-white text-sm font-medium hover:bg-primary/90 transition-colors"
-        >
-          Volver al inicio
-        </Link>
+        <SignOutButton redirectUrl="/sign-in">
+          <button className="inline-block px-4 py-2 rounded-md bg-primary text-white text-sm font-medium hover:bg-primary/90 transition-colors">
+            Cerrar sesión
+          </button>
+        </SignOutButton>
       </div>
     </main>
   )

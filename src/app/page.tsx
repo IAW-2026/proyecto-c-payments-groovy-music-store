@@ -1,15 +1,6 @@
-import { auth } from "@clerk/nextjs/server"
-import { redirect } from "next/navigation"
 import Link from "next/link"
 
-export default async function Home() {
-  const { sessionClaims } = await auth()
-  const roles = (sessionClaims?.roles as string[]) ?? []
-
-  if (!roles.includes("admin_payments")) {
-    redirect("/no-autorizado")
-  }
-
+export default function Home() {
   return (
     <main className="min-h-screen bg-background flex items-center justify-center p-8">
       <div className="max-w-lg w-full text-center space-y-8">
