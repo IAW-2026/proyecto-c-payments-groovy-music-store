@@ -1,5 +1,3 @@
-import { auth } from "@clerk/nextjs/server"
-import { redirect } from "next/navigation"
 import { Suspense } from "react"
 import type { Prisma } from "@prisma/client"
 import { prisma } from "@/lib/prisma"
@@ -29,12 +27,6 @@ export default async function HistorialPage({
 }: {
   searchParams: Promise<SearchParams>
 }) {
-  const { userId, sessionClaims } = await auth()
-  if (!userId) redirect("/sign-in")
-
-  const roles = (sessionClaims?.roles as string[]) ?? []
-  if (!roles.includes("admin_payments")) redirect("/sign-in")
-
   const sp = await searchParams
 
   const query    = sp.query?.trim()    ?? ""
@@ -115,7 +107,7 @@ export default async function HistorialPage({
             : `${total} transacciones en total`}
         </p>
 
-        <div className="bg-card rounded-lg border border-border overflow-hidden mb-6">
+        <div className="bg-card rounded-lg border border-border overflow-visible mb-6">
           <table className="w-full text-sm">
             <thead>
               <tr className="bg-secondary text-white">
@@ -140,7 +132,7 @@ export default async function HistorialPage({
                 </tr>
               ) : (
                 transacciones.map((t, i) => (
-                  <tr key={t.id} className={i % 2 === 0 ? "bg-card" : "bg-background"}>
+                  <tr key={t.id} className={`group ${i % 2 === 0 ? "bg-card" : "bg-background"} hover:bg-primary/15`}>
                     <td className="p-3 text-muted font-mono text-xs">#{t.id}</td>
                     <td className="p-3 text-muted font-mono text-xs">#{t.order_id}</td>
                     <td className="p-3 text-foreground font-medium">{formatCurrency(t.monto_total)}</td>
@@ -164,7 +156,15 @@ export default async function HistorialPage({
                       {nombres[t.seller_id] ?? <span className="text-muted">—</span>}
                       <span className="block font-mono text-[10px] text-muted">{t.seller_id}</span>
                     </td>
-                    <td className="p-3 text-muted">{new Date(t.fecha).toLocaleDateString("es-AR")}</td>
+                    <td className="p-3 pr-8 min-w-[160px] text-muted relative">
+                      {new Date(t.fecha).toLocaleDateString("es-AR")}
+                      <Link
+                        href={`/admin/transacciones/${t.id}`}
+                        className="absolute right-0 top-1/2 translate-x-1/2 -translate-y-1/2 z-10 px-3 py-1 rounded text-xs font-semibold bg-primary text-white shadow-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap"
+                      >
+                        →
+                      </Link>
+                    </td>
                   </tr>
                 ))
               )}

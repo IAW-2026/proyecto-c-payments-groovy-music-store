@@ -1,5 +1,3 @@
-import { auth } from "@clerk/nextjs/server"
-import { redirect } from "next/navigation"
 import { Suspense } from "react"
 import type { Prisma } from "@prisma/client"
 import { prisma } from "@/lib/prisma"
@@ -26,13 +24,6 @@ export default async function HistorialReclamosPage({
 }: {
   searchParams: SearchParams
 }) {
-  const { userId, sessionClaims } = await auth()
-
-  if (!userId) redirect("/sign-in")
-
-  const roles = (sessionClaims?.roles as string[]) ?? []
-  if (!roles.includes("admin_payments")) redirect("/sign-in")
-
   const { qReclamo = "", buyerReclamo = "", sellerReclamo = "", estadoReclamo = "", sortBy = "", sortDir = "" } = await searchParams
 
   const where: Prisma.ReclamoWhereInput = {}
@@ -146,7 +137,7 @@ export default async function HistorialReclamosPage({
                   reclamos.map((r, i) => (
                     <tr
                       key={r.id}
-                      className={`group ${i % 2 === 0 ? "bg-card" : "bg-background"} hover:bg-secondary/5`}
+                      className={`group ${i % 2 === 0 ? "bg-card" : "bg-background"} hover:bg-primary/15`}
                     >
                       <td className="p-3 text-muted font-mono text-xs">#{r.id}</td>
                       <td className="p-3 text-muted font-mono text-xs">#{r.transaccion_id}</td>

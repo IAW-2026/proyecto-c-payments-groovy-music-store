@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
 
 type Transaccion = {
   id: string
@@ -71,7 +72,7 @@ export default function TablaAdminTransacciones({
     : transacciones
 
   return (
-    <div className="bg-card rounded-lg border border-border overflow-hidden">
+    <div className="bg-card rounded-lg border border-border overflow-visible">
       <table className="w-full text-sm">
         <thead>
           <tr className="bg-secondary text-white">
@@ -104,7 +105,7 @@ export default function TablaAdminTransacciones({
             </tr>
           ) : (
             filas.map((t, i) => (
-              <tr key={t.id} className={i % 2 === 0 ? "bg-card" : "bg-background"}>
+              <tr key={t.id} className={`group ${i % 2 === 0 ? "bg-card" : "bg-background"} hover:bg-primary/15`}>
                 <td className="p-3 text-muted font-mono text-xs">#{t.id}</td>
                 <td className="p-3 text-muted font-mono text-xs">#{t.order_id}</td>
                 <td className="p-3 text-foreground font-medium">{formatCurrency(t.monto_total)}</td>
@@ -125,9 +126,15 @@ export default function TablaAdminTransacciones({
                   {nombres[t.buyer_id] ?? <span className="text-muted">—</span>}
                   <span className="block font-mono text-[10px] text-muted">{t.buyer_id}</span>
                 </td>
-                <td className="p-3 text-foreground text-xs">
+                <td className="p-3 pr-6 text-foreground text-xs relative">
                   {nombres[t.seller_id] ?? <span className="text-muted">—</span>}
                   <span className="block font-mono text-[10px] text-muted">{t.seller_id}</span>
+                  <Link
+                    href={`/admin/transacciones/${t.id}`}
+                    className="absolute right-0 top-1/2 translate-x-1/2 -translate-y-1/2 z-10 px-3 py-1 rounded text-xs font-semibold bg-primary text-white shadow-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap"
+                  >
+                    →
+                  </Link>
                 </td>
               </tr>
             ))

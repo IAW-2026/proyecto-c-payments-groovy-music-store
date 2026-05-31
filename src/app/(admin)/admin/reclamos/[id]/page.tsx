@@ -1,5 +1,4 @@
-import { auth } from "@clerk/nextjs/server"
-import { redirect, notFound } from "next/navigation"
+import { notFound } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import { getLabelMotivo } from "@/lib/motivos-reclamo"
 import { getNombresUsuarios } from "@/lib/usuarios"
@@ -11,11 +10,6 @@ export default async function ReclamoDetallePage({
 }: {
   params: Promise<{ id: string }>
 }) {
-  const { userId, sessionClaims } = await auth()
-  if (!userId) redirect("/sign-in")
-  const roles = (sessionClaims?.roles as string[]) ?? []
-  if (!roles.includes("admin_payments")) redirect("/sign-in")
-
   const { id } = await params
 
   const reclamo = await prisma.reclamo.findUnique({

@@ -99,7 +99,7 @@ export default function TablaAdminReclamos({
             </tr>
           ) : (
             filas.map((r, i) => (
-              <tr key={r.id} className={`group ${i % 2 === 0 ? "bg-card" : "bg-background"} hover:bg-secondary/5`}>
+              <tr key={r.id} className={`group ${i % 2 === 0 ? "bg-card" : "bg-background"} hover:bg-primary/15`}>
                 <td className="p-3 text-muted font-mono text-xs">#{r.id}</td>
                 <td className="p-3 text-muted font-mono text-xs">#{r.transaccion_id}</td>
                 <td className="p-3 text-foreground max-w-[200px] truncate" title={getLabelMotivo(r.motivo)}>{getLabelMotivo(r.motivo)}</td>
