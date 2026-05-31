@@ -26,7 +26,7 @@ export default function RootLayout({
               Groovy Payments
             </span>
             <SignOutButton redirectUrl="/sign-in">
-              <button className="px-3 py-1.5 rounded-md bg-white/10 hover:bg-white/20 text-background text-sm font-medium transition-colors">
+              <button className="px-3 py-1.5 rounded-md bg-white/30 hover:bg-white/50 border border-white/40 text-background text-sm font-medium transition-colors">
                 Cerrar sesión
               </button>
             </SignOutButton>

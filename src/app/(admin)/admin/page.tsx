@@ -128,7 +128,15 @@ export default async function AdminPage() {
           <TablaAdminTransacciones transacciones={transacciones} nombres={nombres} />
         </section>
 
-        {/* Últimos reclamos abiertos */}
+        {/* Lista de vendedores */}
+        <Link
+          href="/admin/vendedores"
+          className="block w-full text-center bg-primary text-white font-medium py-3 rounded-lg hover:bg-primary/90 transition-colors mb-10"
+        >
+          Ver vendedores →
+        </Link>
+
+        {/* Ultimos reclamos abiertos */}
         <section>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold text-foreground">Reclamos Abiertos</h2>
