@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
-import { SignOutButton } from "@clerk/nextjs"
 import Link from "next/link"
 import { cormorant, syne, dmSans } from "@/app/ui/fonts";
+import NavButtons from "@/app/ui/nav-buttons"
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -26,19 +26,7 @@ export default function RootLayout({
             <Link href="/" className="text-background font-bold text-lg hover:text-white/80 transition-colors">
               Groovy Payments
             </Link>
-            <div className="flex gap-4">
-              <Link 
-                href="/admin"
-                className="px-3 py-1.5 rounded-md bg-white/30 hover:bg-white/50 border border-white/40 text-background text-sm font-medium transition-colors"
-              >
-                Ir al Panel
-              </Link>
-              <SignOutButton redirectUrl="/sign-in">
-                <button className="px-3 py-1.5 rounded-md bg-white/30 hover:bg-white/50 border border-white/40 text-background text-sm font-medium transition-colors">
-                  Cerrar sesión
-                </button>
-              </SignOutButton>
-            </div>
+            <NavButtons />
           </nav>
           {children}
           <footer className="bg-primary px-8 py-4 text-center text-background text-sm mt-auto">
