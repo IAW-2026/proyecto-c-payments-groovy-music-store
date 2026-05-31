@@ -1,4 +1,5 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server"
+import { NextResponse } from "next/server"
 
 const isAdminRoute = createRouteMatcher(["/admin(.*)"])
 
@@ -10,10 +11,12 @@ export default clerkMiddleware(async (auth, req) => {
       return redirectToSignIn()
     }
     
+    // Está logueado pero no tiene el rol → mandar a página de sin permisos
     const roles = (sessionClaims?.roles as string[]) ?? []
     if (!roles.includes("admin_payments")) {
-      return redirectToSignIn()
+      return NextResponse.redirect(new URL("/no-autorizado", req.url))
     }
+
   }
 })
 
