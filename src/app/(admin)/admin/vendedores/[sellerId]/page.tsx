@@ -1,5 +1,3 @@
-import { auth } from "@clerk/nextjs/server"
-import { redirect } from "next/navigation"
 import { Suspense } from "react"
 import Link from "next/link"
 import type { Prisma } from "@prisma/client"
@@ -26,11 +24,6 @@ export default async function DetalleVendedorPage({
   params: Promise<{ sellerId: string }>
   searchParams: Promise<SearchParams>
 }) {
-  const { userId, sessionClaims } = await auth()
-  if (!userId) redirect("/sign-in")
-  const roles = (sessionClaims?.roles as string[]) ?? []
-  if (!roles.includes("admin_payments")) redirect("/sign-in")
-
   const { sellerId } = await params
   const sp = await searchParams
 

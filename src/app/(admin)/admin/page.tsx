@@ -1,5 +1,3 @@
-import { auth } from "@clerk/nextjs/server"
-import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import Link from "next/link"
 import TablaAdminTransacciones from "@/app/ui/tabla-admin-transacciones"
@@ -7,11 +5,6 @@ import TablaAdminReclamos from "@/app/ui/tabla-admin-reclamos"
 import { getNombresUsuarios } from "@/lib/usuarios"
 
 export default async function AdminPage() {
-  const { userId, sessionClaims } = await auth()
-  if (!userId) redirect("/sign-in")
-  const roles = (sessionClaims?.roles as string[]) ?? []
-  if (!roles.includes("admin_payments")) redirect("/sign-in")
-
   const [
     aggVTP,
     aggFondosRetenidos,

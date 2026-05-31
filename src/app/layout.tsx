@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
 import { SignOutButton } from "@clerk/nextjs"
+import Link from "next/link"
 import { cormorant, syne, dmSans } from "@/app/ui/fonts";
 import "./globals.css";
 
@@ -22,14 +23,22 @@ export default function RootLayout({
       >
         <body className="min-h-full flex flex-col bg-background text-foreground">
           <nav className="bg-primary px-8 py-4 flex items-center justify-between">
-            <span className="text-background font-bold text-lg">
+            <Link href="/" className="text-background font-bold text-lg hover:text-white/80 transition-colors">
               Groovy Payments
-            </span>
-            <SignOutButton redirectUrl="/sign-in">
-              <button className="px-3 py-1.5 rounded-md bg-white/30 hover:bg-white/50 border border-white/40 text-background text-sm font-medium transition-colors">
-                Cerrar sesión
-              </button>
-            </SignOutButton>
+            </Link>
+            <div className="flex gap-4">
+              <Link 
+                href="/admin"
+                className="px-3 py-1.5 rounded-md bg-white/30 hover:bg-white/50 border border-white/40 text-background text-sm font-medium transition-colors"
+              >
+                Ir al Panel
+              </Link>
+              <SignOutButton redirectUrl="/sign-in">
+                <button className="px-3 py-1.5 rounded-md bg-white/30 hover:bg-white/50 border border-white/40 text-background text-sm font-medium transition-colors">
+                  Cerrar sesión
+                </button>
+              </SignOutButton>
+            </div>
           </nav>
           {children}
           <footer className="bg-primary px-8 py-4 text-center text-background text-sm mt-auto">

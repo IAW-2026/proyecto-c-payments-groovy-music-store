@@ -1,15 +1,7 @@
-import { auth } from "@clerk/nextjs/server"
-import { redirect } from "next/navigation"
 import Link from "next/link"
 import { prisma } from "@/lib/prisma"
 
 export default async function VendedoresPage() {
-  // 1. Verificación de acceso
-  const { userId, sessionClaims } = await auth()
-  if (!userId) redirect("/sign-in")
-  const roles = (sessionClaims?.roles as string[]) ?? []
-  if (!roles.includes("admin_payments")) redirect("/sign-in")
-
   // 2. Tres agregaciones en paralelo
   const [retenidos, acreditados, conteos] = await Promise.all([
     prisma.transaccion.groupBy({
