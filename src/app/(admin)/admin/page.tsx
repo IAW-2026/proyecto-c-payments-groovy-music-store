@@ -4,6 +4,10 @@ import TablaAdminTransacciones from "@/app/ui/tabla-admin-transacciones"
 import TablaAdminReclamos from "@/app/ui/tabla-admin-reclamos"
 import { getNombresUsuarios } from "@/lib/usuarios"
 
+// Estados donde la plataforma retiene su ganancia: cuentan para envíos y comisiones.
+// 'reembolsado' (reembolso total) queda excluido: el valor se devolvió por completo.
+const ESTADOS_CONCRETADOS = ["pagado", "acreditado"]
+
 export default async function AdminPage() {
   const [
     aggVTP,
@@ -11,6 +15,7 @@ export default async function AdminPage() {
     transacciones,
     reclamos,
     reclamosCount,
+    aggGanancias,
   ] = await Promise.all([
     prisma.transaccion.aggregate({
       where: { estado: { in: ["pagado", "acreditado"] } },
@@ -28,6 +33,10 @@ export default async function AdminPage() {
       include: { transaccion: { select: { buyer_id: true, seller_id: true } } },
     }),
     prisma.reclamo.count({ where: { estado: "abierto" } }),
+    prisma.transaccion.aggregate({
+      where: { estado: { in: ESTADOS_CONCRETADOS } },
+      _sum: { costoEnvio: true, comision: true },
+    }),
   ])
 
   // Resolver nombres de usuario para los buyer/seller mostrados (fallback al ID).
@@ -37,9 +46,9 @@ export default async function AdminPage() {
   ])
 
   const vtp = aggVTP._sum.monto_total     ?? 0
-  const totalAcreditar = aggVTP._sum.monto_acreditar ?? 0
-  const comisiones = vtp - totalAcreditar
   const fondosRetenidos = aggFondosRetenidos._sum.monto_acreditar ?? 0
+  const gananciaEnvios = aggGanancias._sum.costoEnvio ?? 0
+  const comisionesGanadas = aggGanancias._sum.comision ?? 0
 
   const formatCurrency = (value: number) =>
     value.toLocaleString("es-AR", { style: "currency", currency: "ARS" })
@@ -54,7 +63,7 @@ export default async function AdminPage() {
 
         {/* KPIs */}
         <section className="mb-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
             <div className="bg-card rounded-lg border border-border p-4 flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted">Volumen Total Procesado (VTP)</p>
@@ -64,19 +73,6 @@ export default async function AdminPage() {
               <span className="inline-flex items-center justify-center h-10 w-10 shrink-0 rounded-full bg-emerald-100 text-emerald-700">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                   <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M3 17l6-6 4 4 8-8" />
-                </svg>
-              </span>
-            </div>
-            <div className="bg-card rounded-lg border border-border p-4 flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted">Comisiones de Plataforma</p>
-                <p className="text-2xl font-semibold text-foreground mt-2">{formatCurrency(comisiones)}</p>
-                <p className="text-xs text-muted mt-1">VTP menos monto a acreditar a sellers.</p>
-              </div>
-              <span className="inline-flex items-center justify-center h-10 w-10 shrink-0 rounded-full bg-indigo-100 text-indigo-700">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M14.5 10.5l-5 5M9.5 9.5l5 5" />
-                  <circle cx="6.5" cy="6.5" r="1.5" /><circle cx="17.5" cy="17.5" r="1.5" />
                 </svg>
               </span>
             </div>
@@ -104,6 +100,33 @@ export default async function AdminPage() {
                   <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
                   <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M12 9v4" />
                   <circle cx="12" cy="17" r="1" />
+                </svg>
+              </span>
+            </div>
+            <div className="bg-card rounded-lg border border-border p-4 flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted">Ganancia envíos</p>
+                <p className="text-2xl font-semibold text-foreground mt-2">{formatCurrency(gananciaEnvios)}</p>
+                <p className="text-xs text-muted mt-1">Suma de <em>costoEnvio</em> de transacciones pagadas, acreditadas o reembolsadas.</p>
+              </div>
+              <span className="inline-flex items-center justify-center h-10 w-10 shrink-0 rounded-full bg-primary/15 text-primary">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M1 3h15v13H1z" />
+                  <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M16 8h4l3 3v5h-7z" />
+                  <circle cx="5.5" cy="18.5" r="1.5" /><circle cx="18.5" cy="18.5" r="1.5" />
+                </svg>
+              </span>
+            </div>
+            <div className="bg-card rounded-lg border border-border p-4 flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted">Comisiones ganadas</p>
+                <p className="text-2xl font-semibold text-foreground mt-2">{formatCurrency(comisionesGanadas)}</p>
+                <p className="text-xs text-muted mt-1">Suma de <em>comision</em> de transacciones pagadas, acreditadas o reembolsadas.</p>
+              </div>
+              <span className="inline-flex items-center justify-center h-10 w-10 shrink-0 rounded-full bg-sky-100 text-sky-700">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M19 5L5 19" />
+                  <circle cx="6.5" cy="6.5" r="2.5" /><circle cx="17.5" cy="17.5" r="2.5" />
                 </svg>
               </span>
             </div>

@@ -1,10 +1,20 @@
 import { PrismaClient } from "@prisma/client"
-import { ESTADOS_PAGO, ESTADOS_ACREDITACION } from "../src/lib/constants"
+import { ESTADOS_PAGO, ESTADOS_ACREDITACION, COMISION_PLATAFORMA } from "../src/lib/constants"
 
 const prisma = new PrismaClient()
 
 const [PAGO_PENDIENTE, PAGO_PAGADO, PAGO_FALLIDO] = ESTADOS_PAGO
 const [ACREDITACION_ACREDITADO] = ESTADOS_ACREDITACION
+
+function montos(monto_total: number, costoEnvio: number) {
+  const producto = monto_total - costoEnvio
+  return {
+    monto_total,
+    costoEnvio,
+    comision:        producto * COMISION_PLATAFORMA,
+    monto_acreditar: producto * (1 - COMISION_PLATAFORMA),
+  }
+}
 
 async function main() {
 
@@ -21,21 +31,21 @@ async function main() {
 
   const [t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15] =
     await Promise.all([
-      prisma.transaccion.create({ data: { order_id: "1001", buyer_id: "clerk_buyer_001", seller_id: "clerk_seller_001", monto_total: 48500,  monto_acreditar: 44905,  estado: "acreditado", fecha: diasAtras(60) } }),
-      prisma.transaccion.create({ data: { order_id: "1002", buyer_id: "clerk_buyer_002", seller_id: "clerk_seller_001", monto_total: 12000,  monto_acreditar: 11100,  estado: "pagado",     fecha: diasAtras(55) } }),
-      prisma.transaccion.create({ data: { order_id: "1003", buyer_id: "clerk_buyer_001", seller_id: "clerk_seller_002", monto_total: 32000,  monto_acreditar: 29600,  estado: "acreditado", fecha: diasAtras(50) } }),
-      prisma.transaccion.create({ data: { order_id: "1004", buyer_id: "clerk_buyer_003", seller_id: "clerk_seller_002", monto_total: 75000,  monto_acreditar: 69375,  estado: "pagado",     fecha: diasAtras(45) } }),
-      prisma.transaccion.create({ data: { order_id: "1005", buyer_id: "clerk_buyer_004", seller_id: "clerk_seller_003", monto_total: 9800,   monto_acreditar: 9065,   estado: "fallido",    fecha: diasAtras(42) } }),
-      prisma.transaccion.create({ data: { order_id: "1006", buyer_id: "clerk_buyer_002", seller_id: "clerk_seller_003", monto_total: 21500,  monto_acreditar: 19888,  estado: "acreditado", fecha: diasAtras(38) } }),
-      prisma.transaccion.create({ data: { order_id: "1007", buyer_id: "clerk_buyer_005", seller_id: "clerk_seller_001", monto_total: 55000,  monto_acreditar: 50875,  estado: "pagado",     fecha: diasAtras(34) } }),
-      prisma.transaccion.create({ data: { order_id: "1008", buyer_id: "clerk_buyer_003", seller_id: "clerk_seller_004", monto_total: 18200,  monto_acreditar: 16835,  estado: "reembolsado",fecha: diasAtras(30) } }),
-      prisma.transaccion.create({ data: { order_id: "1009", buyer_id: "clerk_buyer_001", seller_id: "clerk_seller_004", monto_total: 43000,  monto_acreditar: 39775,  estado: "acreditado", fecha: diasAtras(25) } }),
-      prisma.transaccion.create({ data: { order_id: "1010", buyer_id: "clerk_buyer_006", seller_id: "clerk_seller_002", monto_total: 6500,   monto_acreditar: 6013,   estado: "pagado",     fecha: diasAtras(20) } }),
-      prisma.transaccion.create({ data: { order_id: "1011", buyer_id: "clerk_buyer_004", seller_id: "clerk_seller_001", monto_total: 88000,  monto_acreditar: 81400,  estado: "pagado",     fecha: diasAtras(15) } }),
-      prisma.transaccion.create({ data: { order_id: "1012", buyer_id: "clerk_buyer_007", seller_id: "clerk_seller_003", monto_total: 14300,  monto_acreditar: 13228,  estado: "pendiente",  fecha: diasAtras(12) } }),
-      prisma.transaccion.create({ data: { order_id: "1013", buyer_id: "clerk_buyer_005", seller_id: "clerk_seller_004", monto_total: 37500,  monto_acreditar: 34688,  estado: "pagado",     fecha: diasAtras(8)  } }),
-      prisma.transaccion.create({ data: { order_id: "1014", buyer_id: "clerk_buyer_002", seller_id: "clerk_seller_002", monto_total: 5200,   monto_acreditar: 4810,   estado: "fallido",    fecha: diasAtras(5)  } }),
-      prisma.transaccion.create({ data: { order_id: "1015", buyer_id: "clerk_buyer_006", seller_id: "clerk_seller_001", monto_total: 29900,  monto_acreditar: 27658,  estado: "pendiente",  fecha: diasAtras(2)  } }),
+      prisma.transaccion.create({ data: { order_id: "1001", buyer_id: "clerk_buyer_001", seller_id: "clerk_seller_001", ...montos(48500, 2500), estado: "acreditado", fecha: diasAtras(60) } }),
+      prisma.transaccion.create({ data: { order_id: "1002", buyer_id: "clerk_buyer_002", seller_id: "clerk_seller_001", ...montos(12000, 800),  estado: "pagado",     fecha: diasAtras(55) } }),
+      prisma.transaccion.create({ data: { order_id: "1003", buyer_id: "clerk_buyer_001", seller_id: "clerk_seller_002", ...montos(32000, 1500), estado: "acreditado", fecha: diasAtras(50) } }),
+      prisma.transaccion.create({ data: { order_id: "1004", buyer_id: "clerk_buyer_003", seller_id: "clerk_seller_002", ...montos(75000, 3000), estado: "pagado",     fecha: diasAtras(45) } }),
+      prisma.transaccion.create({ data: { order_id: "1005", buyer_id: "clerk_buyer_004", seller_id: "clerk_seller_003", ...montos(9800, 600),   estado: "fallido",    fecha: diasAtras(42) } }),
+      prisma.transaccion.create({ data: { order_id: "1006", buyer_id: "clerk_buyer_002", seller_id: "clerk_seller_003", ...montos(21500, 1200), estado: "acreditado", fecha: diasAtras(38) } }),
+      prisma.transaccion.create({ data: { order_id: "1007", buyer_id: "clerk_buyer_005", seller_id: "clerk_seller_001", ...montos(55000, 2000), estado: "pagado",     fecha: diasAtras(34) } }),
+      prisma.transaccion.create({ data: { order_id: "1008", buyer_id: "clerk_buyer_003", seller_id: "clerk_seller_004", ...montos(18200, 1000), estado: "reembolsado",fecha: diasAtras(30) } }),
+      prisma.transaccion.create({ data: { order_id: "1009", buyer_id: "clerk_buyer_001", seller_id: "clerk_seller_004", ...montos(43000, 1800), estado: "acreditado", fecha: diasAtras(25) } }),
+      prisma.transaccion.create({ data: { order_id: "1010", buyer_id: "clerk_buyer_006", seller_id: "clerk_seller_002", ...montos(6500, 500),   estado: "pagado",     fecha: diasAtras(20) } }),
+      prisma.transaccion.create({ data: { order_id: "1011", buyer_id: "clerk_buyer_004", seller_id: "clerk_seller_001", ...montos(88000, 3500), estado: "pagado",     fecha: diasAtras(15) } }),
+      prisma.transaccion.create({ data: { order_id: "1012", buyer_id: "clerk_buyer_007", seller_id: "clerk_seller_003", ...montos(14300, 900),  estado: "pendiente",  fecha: diasAtras(12) } }),
+      prisma.transaccion.create({ data: { order_id: "1013", buyer_id: "clerk_buyer_005", seller_id: "clerk_seller_004", ...montos(37500, 1600), estado: "pagado",     fecha: diasAtras(8)  } }),
+      prisma.transaccion.create({ data: { order_id: "1014", buyer_id: "clerk_buyer_002", seller_id: "clerk_seller_002", ...montos(5200, 400),   estado: "fallido",    fecha: diasAtras(5)  } }),
+      prisma.transaccion.create({ data: { order_id: "1015", buyer_id: "clerk_buyer_006", seller_id: "clerk_seller_001", ...montos(29900, 1300), estado: "pendiente",  fecha: diasAtras(2)  } }),
     ])
 
   // ─── Pagos ────────────────────────────────────────────────────────────────
@@ -83,6 +93,19 @@ async function main() {
     prisma.reclamo.create({ data: { transaccion_id: t8.id,  motivo: "PRODUCTO_INCORRECTO",   estado: "resuelto", fecha_apertura: diasAtras(28), fecha_resolucion: diasAtras(20), monto_reembolso: 18200  } }),
     prisma.reclamo.create({ data: { transaccion_id: t9.id,  motivo: "PRODUCTO_DANADO",       estado: "resuelto", fecha_apertura: diasAtras(22), fecha_resolucion: diasAtras(15), monto_reembolso: 0      } }),
   ])
+
+  // Verificación de identidad contable (origen: prisma/seed.ts).
+  // Debe cumplirse en cada fila: monto_total = costoEnvio + comision + monto_acreditar.
+  const todas = [t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15]
+  for (const t of todas) {
+    const suma = t.costoEnvio + t.comision + t.monto_acreditar
+    if (Math.abs(suma - t.monto_total) > 0.01) {
+      throw new Error(
+        `Identidad contable rota en order ${t.order_id}: ${suma} ≠ ${t.monto_total}`,
+      )
+    }
+  }
+  console.log(`✔ Identidad contable verificada en ${todas.length} transacciones`)
 
   console.log("✅ Datos de prueba cargados correctamente")
 }
