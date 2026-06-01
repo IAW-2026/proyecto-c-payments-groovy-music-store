@@ -26,10 +26,18 @@ export async function confirmarPago(
   const nuevoEstado = mapearEstado(statusMP)
   if (!nuevoEstado) return null
 
-  await prisma.transaccion.update({
-    where: { id: transaccionId },
-    data:  { estado: nuevoEstado },
-  })
+  // Actualizamos la transacción y su(s) pago(s) al mismo estado, de forma atómica.
+  // El pago ya fue creado en el checkout, acá solo se sincroniza su estado.
+  await prisma.$transaction([
+    prisma.transaccion.update({
+      where: { id: transaccionId },
+      data:  { estado: nuevoEstado },
+    }),
+    prisma.pago.updateMany({
+      where: { transaccion_id: transaccionId },
+      data:  { estado: nuevoEstado },
+    }),
+  ])
 
   return { estado: nuevoEstado }
 }
