@@ -10,6 +10,9 @@
     "seed": "npx tsx prisma/seed.ts",
     "postinstall": "prisma generate"
   },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
   "dependencies": {
     "@clerk/nextjs": "^7.3.3",
     "@heroicons/react": "^2.0.18",
