@@ -6,6 +6,7 @@ import Paginacion from "@/app/ui/paginacion"
 import SortLink from "@/app/ui/sort-link"
 import FiltrosVendedor from "./filtros"
 import BotonAcreditarRetenidos from "./boton-acreditar-retenidos"
+import TablaReclamosVendedor from "./tabla-reclamos-vendedor"
 
 const POR_PAGINA = 20
 const CAMPOS_T = ["id", "order_id", "monto_total", "monto_acreditar", "estado", "fecha"]
@@ -49,7 +50,7 @@ export default async function DetalleVendedorPage({
 
   const baseParams = sp as Record<string, string | undefined>
 
-  const [retenido, acreditado, transacciones, total] = await Promise.all([
+  const [retenido, acreditado, transacciones, total, reclamos] = await Promise.all([
     prisma.transaccion.aggregate({
       where: { seller_id: sellerId, estado: "pagado" },
       _sum: { monto_acreditar: true },
@@ -65,6 +66,11 @@ export default async function DetalleVendedorPage({
       take: POR_PAGINA,
     }),
     prisma.transaccion.count({ where }),
+    // Los reclamos no tienen seller_id: se filtran a través de la transacción.
+    prisma.reclamo.findMany({
+      where: { transaccion: { seller_id: sellerId } },
+      orderBy: { fecha_apertura: "desc" },
+    }),
   ])
 
   const balanceRetenido   = retenido._sum.monto_acreditar   ?? 0
@@ -187,7 +193,15 @@ export default async function DetalleVendedorPage({
             </table>
           </div>
 
-          <Paginacion paginaActual={pagina} tieneMasPaginas={tieneMasPaginas} />
+          {total > POR_PAGINA && (
+            <Paginacion paginaActual={pagina} tieneMasPaginas={tieneMasPaginas} />
+          )}
+        </section>
+
+        {/* Reclamos del vendedor (filtrados vía la transacción asociada) */}
+        <section className="mt-10">
+          <h2 className="text-xl font-semibold text-foreground mb-4">Reclamos</h2>
+          <TablaReclamosVendedor reclamos={reclamos} />
         </section>
       </div>
     </main>

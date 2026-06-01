@@ -171,7 +171,9 @@ export default async function HistorialPage({
           </table>
         </div>
 
-        <Paginacion paginaActual={pagina} tieneMasPaginas={tieneMasPaginas} />
+        {total > POR_PAGINA && (
+          <Paginacion paginaActual={pagina} tieneMasPaginas={tieneMasPaginas} />
+        )}
       </div>
     </main>
   )
