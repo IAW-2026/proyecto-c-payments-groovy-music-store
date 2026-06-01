@@ -1,5 +1,9 @@
+import { confirmarPago } from "@/lib/confirmar-pago"
+
 type SearchParams = {
+  payment_id?:         string
   external_reference?: string
+  status?:             string
 }
 
 export default async function PagoPendientePage({
@@ -7,8 +11,17 @@ export default async function PagoPendientePage({
 }: {
   searchParams: Promise<SearchParams>
 }) {
-  const sp = await searchParams
+  const sp            = await searchParams
+  const paymentId     = sp.payment_id
   const transaccionId = sp.external_reference
+
+  if (paymentId && transaccionId) {
+    try {
+      await confirmarPago(paymentId, transaccionId)
+    } catch (err) {
+      console.error("confirmarPago desde /pago/pendiente:", err)
+    }
+  }
 
   return (
     <main className="min-h-screen bg-background flex items-center justify-center p-8">
