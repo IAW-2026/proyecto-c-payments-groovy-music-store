@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
+import { ESTADOS_ACREDITACION } from "@/lib/constants"
+
+const [ACREDITACION_ACREDITADO] = ESTADOS_ACREDITACION
 
 export async function POST(request: Request) {
   try {
@@ -43,7 +46,7 @@ export async function POST(request: Request) {
           transaccion_id: transaccion_id,
           seller_id:      transaccion.seller_id,
           monto:          transaccion.monto_acreditar,
-          estado:         "acreditado",
+          estado:         ACREDITACION_ACREDITADO,
         },
       }),
     ])

@@ -2,6 +2,9 @@
 
 import { prisma } from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
+import { ESTADOS_ACREDITACION } from "@/lib/constants"
+
+const [ACREDITACION_ACREDITADO] = ESTADOS_ACREDITACION
 
 export type AcreditarState = { ok: boolean; message: string } | null
 
@@ -40,7 +43,7 @@ export async function acreditarTransaccion(
         transaccion_id: transaccionId,
         seller_id:      transaccion.seller_id,
         monto:          transaccion.monto_acreditar,
-        estado:         "acreditado",
+        estado:         ACREDITACION_ACREDITADO,
       },
     }),
   ])

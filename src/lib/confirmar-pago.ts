@@ -1,12 +1,15 @@
 import { getPayment } from "@/lib/mercadopago"
 import { prisma } from "@/lib/prisma"
+import { ESTADOS_PAGO } from "@/lib/constants"
+
+const [PAGO_PENDIENTE, PAGO_PAGADO, PAGO_FALLIDO] = ESTADOS_PAGO
 
 function mapearEstado(statusMP: string): string | null {
   switch (statusMP) {
-    case "approved":   return "pagado"
-    case "rejected":   return "fallido"
+    case "approved":   return PAGO_PAGADO
+    case "rejected":   return PAGO_FALLIDO
     case "pending":
-    case "in_process": return "pendiente"
+    case "in_process": return PAGO_PENDIENTE
     default:           return null
   }
 }

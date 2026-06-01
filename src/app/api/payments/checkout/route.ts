@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { getPreference } from "@/lib/mercadopago"
+import { ESTADOS_PAGO } from "@/lib/constants"
+
+const [PAGO_PENDIENTE] = ESTADOS_PAGO
 
 export async function POST(request: Request) {
   try {
@@ -31,7 +34,7 @@ export async function POST(request: Request) {
           create: {
             buyer_id,
             monto: monto_total,
-            estado: "pendiente",
+            estado: PAGO_PENDIENTE,
           },
         },
       },
