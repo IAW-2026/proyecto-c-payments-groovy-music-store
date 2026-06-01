@@ -72,14 +72,14 @@ export default function TablaReclamosVendedor({ reclamos }: { reclamos: Reclamo[
 
   return (
     <div className="bg-card rounded-lg border border-border overflow-hidden">
-      <table className="w-full text-sm">
+      <table className="w-full text-sm text-center">
         <thead>
           <tr className="bg-secondary text-white">
             {COLUMNAS.map(({ label, campo }) => {
               const isActive = sortCampo === campo
               const icon = !isActive ? "↕" : sortDir === "desc" ? "↓" : "↑"
               return (
-                <th key={campo} className="p-3 text-left">
+                <th key={campo} scope="col" className="p-3">
                   <button
                     type="button"
                     onClick={() => handleSort(campo)}

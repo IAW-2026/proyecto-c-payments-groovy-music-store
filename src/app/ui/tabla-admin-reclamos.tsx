@@ -65,17 +65,18 @@ export default function TablaAdminReclamos({
 
   return (
     <div className="bg-card rounded-lg border border-border overflow-visible">
-      <table className="w-full text-sm">
+      <table className="w-full text-sm text-center">
         <thead>
           <tr className="bg-secondary text-white">
             {COLUMNAS.map(({ label, campo }) => {
               const isActive = sortCampo === campo
               const icon = !isActive ? "↕" : sortDir === "desc" ? "↓" : "↑"
               return (
-                <th key={campo} className="p-3 text-left">
+                <th key={campo} scope="col" className="p-3">
                   <button
                     type="button"
                     onClick={() => handleSort(campo)}
+                    aria-label={`Ordenar por ${label}${isActive ? `, orden actual ${sortDir === "desc" ? "descendente" : "ascendente"}` : ""}`}
                     className={`inline-flex items-center gap-1 whitespace-nowrap transition-opacity hover:opacity-75 ${
                       isActive ? "text-primary" : ""
                     }`}
@@ -86,8 +87,8 @@ export default function TablaAdminReclamos({
                 </th>
               )
             })}
-            <th className="p-3 text-left">ID Buyer</th>
-            <th className="p-3 text-left">ID Seller</th>
+            <th scope="col" className="p-3">ID Buyer</th>
+            <th scope="col" className="p-3">ID Seller</th>
           </tr>
         </thead>
         <tbody>

@@ -107,17 +107,17 @@ export default async function HistorialPage({
         </p>
 
         <div className="bg-card rounded-lg border border-border overflow-visible mb-6">
-          <table className="w-full text-sm">
+          <table className="w-full text-sm text-center">
             <thead>
               <tr className="bg-secondary text-white">
-                <th className="p-3 text-left"><SortLink label="ID" sortKey="id" currentSortBy={sortBy} currentSortDir={sortDir} baseParams={baseParams} /></th>
-                <th className="p-3 text-left"><SortLink label="Order ID" sortKey="order_id" currentSortBy={sortBy} currentSortDir={sortDir} baseParams={baseParams} /></th>
-                <th className="p-3 text-left"><SortLink label="Monto Total" sortKey="monto_total" currentSortBy={sortBy} currentSortDir={sortDir} baseParams={baseParams} /></th>
-                <th className="p-3 text-left"><SortLink label="A Acreditar" sortKey="monto_acreditar" currentSortBy={sortBy} currentSortDir={sortDir} baseParams={baseParams} /></th>
-                <th className="p-3 text-left"><SortLink label="Estado" sortKey="estado" currentSortBy={sortBy} currentSortDir={sortDir} baseParams={baseParams} /></th>
-                <th className="p-3 text-left"><SortLink label="Buyer ID" sortKey="buyer_id" currentSortBy={sortBy} currentSortDir={sortDir} baseParams={baseParams} /></th>
-                <th className="p-3 text-left"><SortLink label="Seller ID" sortKey="seller_id" currentSortBy={sortBy} currentSortDir={sortDir} baseParams={baseParams} /></th>
-                <th className="p-3 text-left"><SortLink label="Fecha" sortKey="fecha" currentSortBy={sortBy} currentSortDir={sortDir} baseParams={baseParams} /></th>
+                <th scope="col" className="p-3"><SortLink label="ID" sortKey="id" currentSortBy={sortBy} currentSortDir={sortDir} baseParams={baseParams} /></th>
+                <th scope="col" className="p-3"><SortLink label="Order ID" sortKey="order_id" currentSortBy={sortBy} currentSortDir={sortDir} baseParams={baseParams} /></th>
+                <th scope="col" className="p-3"><SortLink label="Monto Total" sortKey="monto_total" currentSortBy={sortBy} currentSortDir={sortDir} baseParams={baseParams} /></th>
+                <th scope="col" className="p-3"><SortLink label="A Acreditar" sortKey="monto_acreditar" currentSortBy={sortBy} currentSortDir={sortDir} baseParams={baseParams} /></th>
+                <th scope="col" className="p-3"><SortLink label="Estado" sortKey="estado" currentSortBy={sortBy} currentSortDir={sortDir} baseParams={baseParams} /></th>
+                <th scope="col" className="p-3"><SortLink label="Buyer ID" sortKey="buyer_id" currentSortBy={sortBy} currentSortDir={sortDir} baseParams={baseParams} /></th>
+                <th scope="col" className="p-3"><SortLink label="Seller ID" sortKey="seller_id" currentSortBy={sortBy} currentSortDir={sortDir} baseParams={baseParams} /></th>
+                <th scope="col" className="p-3"><SortLink label="Fecha" sortKey="fecha" currentSortBy={sortBy} currentSortDir={sortDir} baseParams={baseParams} /></th>
               </tr>
             </thead>
             <tbody>
@@ -157,8 +157,9 @@ export default async function HistorialPage({
                     </td>
                     <td className="p-3 pr-8 min-w-[160px] text-muted relative">
                       {new Date(t.fecha).toLocaleDateString("es-AR")}
-                      <Link
+                        <Link
                         href={`/admin/transacciones/${t.id}`}
+                          aria-label={`Ver detalle de la transacción ${t.id}`}
                         className="absolute right-0 top-1/2 translate-x-1/2 -translate-y-1/2 z-10 px-3 py-1 rounded text-xs font-semibold bg-primary text-white shadow-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap"
                       >
                         →

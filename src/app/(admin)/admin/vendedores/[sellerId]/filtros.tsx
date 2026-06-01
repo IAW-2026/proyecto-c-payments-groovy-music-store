@@ -40,14 +40,22 @@ export default function FiltrosVendedor() {
 
   return (
     <div className="flex gap-2 items-center">
+      <label htmlFor="filtro-transaccion" className="sr-only">
+        Buscar por ID de transacción u orden
+      </label>
       <input
+        id="filtro-transaccion"
         type="text"
         value={query}
         onChange={(e) => onQuery(e.target.value)}
         placeholder="Buscar por ID de transacción u orden"
         className="flex-1 px-3 py-2 rounded-md border border-border bg-card text-foreground text-sm placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-primary"
       />
+      <label htmlFor="estado-filtros-vendedor" className="sr-only">
+        Filtrar por estado
+      </label>
       <select
+        id="estado-filtros-vendedor"
         value={estado}
         onChange={(e) => onEstado(e.target.value)}
         className="px-3 py-2 rounded-md border border-border bg-card text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary"

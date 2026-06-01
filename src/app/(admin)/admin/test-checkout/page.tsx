@@ -16,6 +16,13 @@ export default function TestCheckoutPage() {
   } | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [cargando, setCargando] = useState(false)
+  const inputIds = {
+    order_id: "checkout-order-id",
+    buyer_id: "checkout-buyer-id",
+    seller_id: "checkout-seller-id",
+    monto_total: "checkout-monto-total",
+    costoEnvio: "checkout-costo-envio",
+  }
 
   async function handleSubmit() {
     setCargando(true)
@@ -57,8 +64,9 @@ export default function TestCheckoutPage() {
       <div className="flex flex-col gap-4">
         {Object.entries(form).map(([key, value]) => (
           <div key={key} className="flex flex-col gap-1">
-            <label className="text-sm font-medium text-foreground">{key}</label>
+            <label htmlFor={inputIds[key as keyof typeof inputIds]} className="text-sm font-medium text-foreground">{key}</label>
             <input
+              id={inputIds[key as keyof typeof inputIds]}
               className="border border-border rounded px-3 py-2 bg-card text-foreground"
               value={value}
               onChange={(e) => setForm((f) => ({ ...f, [key]: e.target.value }))}

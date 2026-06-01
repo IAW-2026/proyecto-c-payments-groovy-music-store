@@ -111,17 +111,17 @@ export default async function HistorialReclamosPage({
           </p>
 
           <div className="bg-card rounded-lg border border-border overflow-visible">
-            <table className="w-full min-w-[1200px] text-sm">
+            <table className="w-full min-w-[1200px] text-sm text-center">
               <thead>
                 <tr className="bg-secondary text-white">
-                  <th className="p-3 text-left"><SortLink label="ID" sortKey="id" currentSortBy={sortBy} currentSortDir={sortDir} baseParams={baseParams} /></th>
-                  <th className="p-3 text-left"><SortLink label="Transacción" sortKey="transaccion_id" currentSortBy={sortBy} currentSortDir={sortDir} baseParams={baseParams} /></th>
-                  <th className="p-3 text-left"><SortLink label="Motivo" sortKey="motivo" currentSortBy={sortBy} currentSortDir={sortDir} baseParams={baseParams} /></th>
-                  <th className="p-3 text-left"><SortLink label="Estado" sortKey="estado" currentSortBy={sortBy} currentSortDir={sortDir} baseParams={baseParams} /></th>
-                  <th className="p-3 text-left">Monto</th>
-                  <th className="p-3 text-left"><SortLink label="Fecha Apertura" sortKey="fecha_apertura" currentSortBy={sortBy} currentSortDir={sortDir} baseParams={baseParams} /></th>
-                  <th className="p-3 text-left">ID Buyer</th>
-                  <th className="p-3 text-left">ID Seller</th>
+                  <th scope="col" className="p-3"><SortLink label="ID" sortKey="id" currentSortBy={sortBy} currentSortDir={sortDir} baseParams={baseParams} /></th>
+                  <th scope="col" className="p-3"><SortLink label="Transacción" sortKey="transaccion_id" currentSortBy={sortBy} currentSortDir={sortDir} baseParams={baseParams} /></th>
+                  <th scope="col" className="p-3"><SortLink label="Motivo" sortKey="motivo" currentSortBy={sortBy} currentSortDir={sortDir} baseParams={baseParams} /></th>
+                  <th scope="col" className="p-3"><SortLink label="Estado" sortKey="estado" currentSortBy={sortBy} currentSortDir={sortDir} baseParams={baseParams} /></th>
+                  <th scope="col" className="p-3">Monto</th>
+                  <th scope="col" className="p-3"><SortLink label="Fecha Apertura" sortKey="fecha_apertura" currentSortBy={sortBy} currentSortDir={sortDir} baseParams={baseParams} /></th>
+                  <th scope="col" className="p-3">ID Buyer</th>
+                  <th scope="col" className="p-3">ID Seller</th>
                 </tr>
               </thead>
               <tbody>
@@ -167,6 +167,7 @@ export default async function HistorialReclamosPage({
                         {r.estado === "abierto" && (
                           <Link
                             href={`/admin/reclamos/${r.id}`}
+                            aria-label={`Resolver reclamo ${r.id}`}
                             className="absolute right-0 top-1/2 translate-x-1/2 -translate-y-1/2 z-10 px-3 py-1 rounded text-xs font-semibold bg-primary text-white shadow-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap"
                           >
                             →

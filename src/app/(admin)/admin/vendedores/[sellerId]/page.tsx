@@ -90,7 +90,7 @@ export default async function DetalleVendedorPage({
             <h1 className="text-3xl font-bold text-foreground">Vendedor</h1>
             <p className="text-muted mt-1 font-mono text-sm">{sellerId}</p>
           </div>
-          <Link href="/admin/vendedores" className="text-sm text-primary hover:underline">
+          <Link href="/admin/vendedores" className="text-sm text-primary hover:underline" aria-label="Volver al listado de vendedores">
             ← Volver a vendedores
           </Link>
         </div>
@@ -139,15 +139,15 @@ export default async function DetalleVendedorPage({
           </p>
 
           <div className="bg-card rounded-lg border border-border overflow-visible mb-6">
-            <table className="w-full text-sm">
+            <table className="w-full text-sm text-center">
               <thead>
                 <tr className="bg-secondary text-white">
-                  <th scope="col" className="p-3 text-left"><SortLink label="ID" sortKey="id" currentSortBy={sortBy} currentSortDir={sortDir} baseParams={baseParams} /></th>
-                  <th scope="col" className="p-3 text-left"><SortLink label="Order ID" sortKey="order_id" currentSortBy={sortBy} currentSortDir={sortDir} baseParams={baseParams} /></th>
-                  <th scope="col" className="p-3 text-left"><SortLink label="Monto Total" sortKey="monto_total" currentSortBy={sortBy} currentSortDir={sortDir} baseParams={baseParams} /></th>
-                  <th scope="col" className="p-3 text-left"><SortLink label="A Acreditar" sortKey="monto_acreditar" currentSortBy={sortBy} currentSortDir={sortDir} baseParams={baseParams} /></th>
-                  <th scope="col" className="p-3 text-left"><SortLink label="Estado" sortKey="estado" currentSortBy={sortBy} currentSortDir={sortDir} baseParams={baseParams} /></th>
-                  <th scope="col" className="p-3 text-left"><SortLink label="Fecha" sortKey="fecha" currentSortBy={sortBy} currentSortDir={sortDir} baseParams={baseParams} /></th>
+                  <th scope="col" className="p-3"><SortLink label="ID" sortKey="id" currentSortBy={sortBy} currentSortDir={sortDir} baseParams={baseParams} /></th>
+                  <th scope="col" className="p-3"><SortLink label="Order ID" sortKey="order_id" currentSortBy={sortBy} currentSortDir={sortDir} baseParams={baseParams} /></th>
+                  <th scope="col" className="p-3"><SortLink label="Monto Total" sortKey="monto_total" currentSortBy={sortBy} currentSortDir={sortDir} baseParams={baseParams} /></th>
+                  <th scope="col" className="p-3"><SortLink label="A Acreditar" sortKey="monto_acreditar" currentSortBy={sortBy} currentSortDir={sortDir} baseParams={baseParams} /></th>
+                  <th scope="col" className="p-3"><SortLink label="Estado" sortKey="estado" currentSortBy={sortBy} currentSortDir={sortDir} baseParams={baseParams} /></th>
+                  <th scope="col" className="p-3"><SortLink label="Fecha" sortKey="fecha" currentSortBy={sortBy} currentSortDir={sortDir} baseParams={baseParams} /></th>
                 </tr>
               </thead>
               <tbody>
@@ -181,6 +181,7 @@ export default async function DetalleVendedorPage({
                         {new Date(t.fecha).toLocaleDateString("es-AR")}
                         <Link
                           href={`/admin/transacciones/${t.id}`}
+                          aria-label={`Ver detalle de la transacción ${t.id}`}
                           className="absolute right-0 top-1/2 translate-x-1/2 -translate-y-1/2 z-10 px-3 py-1 rounded text-xs font-semibold bg-primary text-white shadow-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap"
                         >
                           →

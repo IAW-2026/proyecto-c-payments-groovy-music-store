@@ -20,6 +20,11 @@ export default function FormularioResolucion({
   const [decision, setDecision] = useState<Decision>("")
   const [monto, setMonto] = useState("")
 
+  const decisionTotalId = "decision-reembolso-total"
+  const decisionParcialId = "decision-reembolso-parcial"
+  const decisionRechazarId = "decision-rechazar-reclamo"
+  const montoInputId = "monto-reembolso-parcial"
+
   return (
     <section className="bg-card rounded-lg border border-border p-6">
       <h2 className="text-lg font-semibold text-foreground mb-4">Resolver Reclamo</h2>
@@ -32,8 +37,9 @@ export default function FormularioResolucion({
         <fieldset className="space-y-3">
           <legend className="text-sm text-muted mb-2">Decisión</legend>
 
-          <label className="flex items-center gap-3 cursor-pointer">
+          <label htmlFor={decisionTotalId} className="flex items-center gap-3 cursor-pointer">
             <input
+              id={decisionTotalId}
               type="radio"
               name="decision"
               value="REEMBOLSO_TOTAL"
@@ -46,8 +52,9 @@ export default function FormularioResolucion({
             </span>
           </label>
 
-          <label className="flex items-center gap-3 cursor-pointer">
+          <label htmlFor={decisionParcialId} className="flex items-center gap-3 cursor-pointer">
             <input
+              id={decisionParcialId}
               type="radio"
               name="decision"
               value="REEMBOLSO_PARCIAL"
@@ -58,8 +65,9 @@ export default function FormularioResolucion({
             <span className="text-sm text-foreground">Reembolso parcial</span>
           </label>
 
-          <label className="flex items-center gap-3 cursor-pointer">
+          <label htmlFor={decisionRechazarId} className="flex items-center gap-3 cursor-pointer">
             <input
+              id={decisionRechazarId}
               type="radio"
               name="decision"
               value="RECHAZAR"
@@ -73,10 +81,11 @@ export default function FormularioResolucion({
 
         {decision === "REEMBOLSO_PARCIAL" && (
           <div>
-            <label className="block text-sm text-muted mb-1">
+            <label htmlFor={montoInputId} className="block text-sm text-muted mb-1">
               Monto a reembolsar (ARS)
             </label>
             <input
+              id={montoInputId}
               type="number"
               name="monto"
               value={monto}
