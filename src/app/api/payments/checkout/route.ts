@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
-import { preference } from "@/lib/mercadopago"
+import { getPreference } from "@/lib/mercadopago"
 
 export async function POST(request: Request) {
   try {
@@ -34,7 +34,7 @@ export async function POST(request: Request) {
     const esLocal = baseUrl.includes("localhost") 
     // Para que no retorne el approved en local, no se puede redirigir a localhost desde mp
 
-    const resultado = await preference.create({
+    const resultado = await getPreference().create({
       body: {
         items: [
           {

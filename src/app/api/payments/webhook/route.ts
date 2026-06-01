@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
-import { payment } from "@/lib/mercadopago"
+import { getPayment } from "@/lib/mercadopago"
 
 // Mapeo de estados de MP a estados de nuestra app
 function mapearEstado(statusMP: string): string | null {
@@ -31,7 +31,7 @@ export async function POST(request: Request) {
     const token = process.env.MP_ACCESS_TOKEN
     console.log(`Token presente: ${!!token}, primeros 10 chars: ${token?.slice(0, 10)}`)
 
-    const pagoMP = await payment.get({ id: String(paymentId) })
+    const pagoMP = await getPayment().get({ id: String(paymentId) })
 
     const statusMP      = pagoMP.status
     const transaccionId = pagoMP.external_reference
