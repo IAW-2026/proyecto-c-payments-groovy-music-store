@@ -60,7 +60,7 @@ export async function POST(request: Request) {
     //devuelvo url a buyerapp
     return NextResponse.json({
       transaccion_id: transaccion.id,
-      init_point: resultado.sandbox_init_point,
+      init_point: resultado.init_point,
     })
   } catch (error) {
     console.error("Error en /checkout:", error) 
