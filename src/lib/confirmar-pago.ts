@@ -4,6 +4,9 @@ import { ESTADOS_PAGO } from "@/lib/constants"
 
 const [PAGO_PENDIENTE, PAGO_PAGADO, PAGO_FALLIDO] = ESTADOS_PAGO
 
+// Tipo del objeto que devuelve payment.get() del SDK de MercadoPago.
+export type PagoMP = Awaited<ReturnType<ReturnType<typeof getPayment>["get"]>>
+
 function mapearEstado(statusMP: string): string | null {
   switch (statusMP) {
     case "approved":   return PAGO_PAGADO
@@ -15,15 +18,19 @@ function mapearEstado(statusMP: string): string | null {
 }
 
 /**
- * Consulta el estado real del pago en MP y actualiza la transacción en DB.
+ * Consulta el estado real del pago en MP y actualiza la transacción + su pago.
  * Retorna el nuevo estado, o null si no hay estado mapeable.
+ *
+ * `pagoMP` es opcional: si quien llama ya consultó el pago a MP, lo pasa para
+ * evitar una segunda llamada a la API. Si se omite, se consulta acá.
  */
 export async function confirmarPago(
   paymentId: string,
   transaccionId: string,
+  pagoMP?: PagoMP,
 ): Promise<{ estado: string } | null> {
-  const pagoMP   = await getPayment().get({ id: paymentId })
-  const statusMP = pagoMP.status
+  const pago     = pagoMP ?? await getPayment().get({ id: paymentId })
+  const statusMP = pago.status
   if (!statusMP) return null
 
   const nuevoEstado = mapearEstado(statusMP)
