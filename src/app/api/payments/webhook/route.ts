@@ -28,28 +28,33 @@ export async function POST(request: Request) {
     }
 
     // Consultamos el pago completo a MP usando el ID
+    const token = process.env.MP_ACCESS_TOKEN
+    console.log(`Token presente: ${!!token}, primeros 10 chars: ${token?.slice(0, 10)}`)
+
     const pagoMP = await payment.get({ id: String(paymentId) })
 
-    const statusMP        = pagoMP.status
-    const transaccionId   = pagoMP.external_reference
+    const statusMP      = pagoMP.status
+    const transaccionId = pagoMP.external_reference
 
-    // si no podemos mapear el estado o no tenemos referencia, lo ignoramos
+    console.log(`Webhook recibido: paymentId=${paymentId} status=${statusMP} transaccionId=${transaccionId}`)
+
     if (!statusMP || !transaccionId) {
+      console.log("Webhook ignorado: falta statusMP o transaccionId")
       return NextResponse.json({ recibido: true }, { status: 200 })
     }
 
     const nuevoEstado = mapearEstado(statusMP)
     if (!nuevoEstado) {
+      console.log(`Webhook ignorado: estado MP desconocido "${statusMP}"`)
       return NextResponse.json({ recibido: true }, { status: 200 })
     }
 
-    //actualizamos la transaccion en nuestra BD
     await prisma.transaccion.update({
       where: { id: transaccionId },
       data:  { estado: nuevoEstado },
     })
 
-    console.log(`Webhook: transaccion ${transaccionId} → ${nuevoEstado}`)
+    console.log(`Webhook OK: transaccion ${transaccionId} → ${nuevoEstado}`)
 
     return NextResponse.json({ recibido: true }, { status: 200 })
 
