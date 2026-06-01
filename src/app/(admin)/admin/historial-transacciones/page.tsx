@@ -6,8 +6,7 @@ import Paginacion from "@/app/ui/paginacion"
 import Link from "next/link"
 import SortLink from "@/app/ui/sort-link"
 import { getNombresUsuarios } from "@/lib/usuarios"
-
-const ESTADOS_TRANSACCION = ["pendiente", "pagado", "acreditado", "fallido", "reembolsado"] as const
+import { ESTADOS_TRANSACCION } from "@/lib/constants"
 const CAMPOS_T = ["id", "order_id", "monto_total", "monto_acreditar", "estado", "fecha", "buyer_id", "seller_id"]
 
 const POR_PAGINA = 50
