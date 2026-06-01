@@ -1,9 +1,9 @@
 import { confirmarPago } from "@/lib/confirmar-pago"
 
 type SearchParams = {
-  payment_id?:        string
+  payment_id?:         string
   external_reference?: string
-  status?:            string
+  status?:             string
 }
 
 export default async function PagoExitosoPage({
@@ -14,12 +14,8 @@ export default async function PagoExitosoPage({
   const sp            = await searchParams
   const paymentId     = sp.payment_id
   const transaccionId = sp.external_reference
-  const status        = sp.status
 
-  // Consulta el estado real a MP y actualiza la DB al cargar la página.
-  // Solo lo intenta cuando MP indica approved para evitar llamadas innecesarias.
-  // El webhook sigue activo como respaldo si llega antes.
-  if (paymentId && transaccionId && status === "approved") {
+  if (paymentId && transaccionId) {
     try {
       await confirmarPago(paymentId, transaccionId)
     } catch (err) {
