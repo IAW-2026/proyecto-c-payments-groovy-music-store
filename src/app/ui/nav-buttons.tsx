@@ -11,6 +11,12 @@ export default function NavButtons() {
   return (
     <div className="flex gap-4">
       <Link
+        href="/admin/test-checkout"
+        className="px-3 py-1.5 rounded-md bg-white/30 hover:bg-white/50 border border-white/40 text-background text-sm font-medium transition-colors"
+      >
+        Generar pago MP (provisional)
+      </Link>
+      <Link
         href="/admin"
         className="px-3 py-1.5 rounded-md bg-white/30 hover:bg-white/50 border border-white/40 text-background text-sm font-medium transition-colors"
       >

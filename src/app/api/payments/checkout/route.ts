@@ -65,7 +65,6 @@ export async function POST(request: Request) {
         ...(esLocal ? {} : { auto_return: "approved" }),
         external_reference: String(transaccion.id),
         notification_url: `${baseUrl}/api/payments/webhook`,
-        payer: { email: "test_user_buyer@testuser.com" },
       },
     })
 
