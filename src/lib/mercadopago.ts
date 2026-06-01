@@ -1,4 +1,4 @@
-import MercadoPagoConfig, { Preference, Payment } from "mercadopago"
+import MercadoPagoConfig, { Preference, Payment, MerchantOrder } from "mercadopago"
 
 function getClient() {
   const token = process.env.MP_ACCESS_TOKEN
@@ -12,4 +12,8 @@ export function getPreference() {
 
 export function getPayment() {
   return new Payment(getClient())
+}
+
+export function getMerchantOrder() {
+  return new MerchantOrder(getClient())
 }
