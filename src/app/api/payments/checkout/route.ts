@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { getPreference } from "@/lib/mercadopago"
-import { ESTADOS_PAGO } from "@/lib/constants"
+import { ESTADOS_PAGO, COMISION_PLATAFORMA } from "@/lib/constants"
 
 const [PAGO_PENDIENTE] = ESTADOS_PAGO
 
@@ -19,6 +19,14 @@ export async function POST(request: Request) {
       )
     }
 
+    // monto_total YA incluye el envío. La comisión es 15% sobre el producto
+    // (producto = monto_total - costoEnvio). Identidad contable que siempre vale:
+    //   monto_total = costoEnvio + comision + monto_acreditar
+    const envio           = costoEnvio ?? 0
+    const producto        = monto_total - envio
+    const comision        = producto * COMISION_PLATAFORMA
+    const monto_acreditar = producto * (1 - COMISION_PLATAFORMA)
+
     // creamos la transaccion en la base de datos
     const transaccion = await prisma.transaccion.create({
       data: {
@@ -26,7 +34,9 @@ export async function POST(request: Request) {
         buyer_id,
         seller_id,
         monto_total,
-        monto_acreditar: monto_total - (costoEnvio ?? 0),
+        costoEnvio: envio,
+        comision,
+        monto_acreditar,
         estado: "pendiente",
         // El pago se registra junto con la transacción (nested write atómico).
         // Toma el id de la transacción automáticamente.
@@ -41,7 +51,11 @@ export async function POST(request: Request) {
     })
 
     // creamos preferencia en mp
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL!
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL?.replace(/\/$/, "")
+
+    if (!baseUrl) {
+      throw new Error("NEXT_PUBLIC_BASE_URL no está configurado")
+    }
 
     const esLocal = baseUrl.includes("localhost") 
     // Para que no retorne el approved en local, no se puede redirigir a localhost desde mp

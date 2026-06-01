@@ -13,6 +13,8 @@ model Transaccion {
   buyer_id        String
   seller_id       String
   monto_total     Float
+  costoEnvio      Float          @default(0)
+  comision        Float          @default(0)
   monto_acreditar Float
   estado          String         @default("pendiente")
   fecha           DateTime       @default(now())

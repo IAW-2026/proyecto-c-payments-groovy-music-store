@@ -39,7 +39,9 @@ export async function resolverReclamo(formData: FormData) {
     },
   })
 
-  if (decision !== "RECHAZAR") {
+  if (decision === "REEMBOLSO_TOTAL") {
+    // Reembolso total: la transacción pasa a 'reembolsado' y queda excluida
+    // de todas las métricas y balances (el valor se devolvió por completo).
     await prisma.$transaction([
       reclamoUpdate,
       prisma.transaccion.update({
@@ -47,7 +49,24 @@ export async function resolverReclamo(formData: FormData) {
         data:  { estado: "reembolsado" },
       }),
     ])
+  } else if (decision === "REEMBOLSO_PARCIAL") {
+    // Reembolso parcial: el monto sale ÚNICAMENTE de la acreditación al vendedor,
+    // con piso en 0. La transacción NO pasa a 'reembolsado': sigue contando
+    // (la plataforma conserva su comisión y la ganancia de envío).
+    const t = await prisma.transaccion.findUnique({
+      where: { id: transaccionId },
+      select: { monto_acreditar: true },
+    })
+    const nuevoAcreditar = Math.max(0, (t?.monto_acreditar ?? 0) - montoReembolso)
+    await prisma.$transaction([
+      reclamoUpdate,
+      prisma.transaccion.update({
+        where: { id: transaccionId },
+        data:  { monto_acreditar: nuevoAcreditar },
+      }),
+    ])
   } else {
+    // RECHAZAR: solo se cierra el reclamo, la transacción no cambia.
     await prisma.$transaction([reclamoUpdate])
   }
 
