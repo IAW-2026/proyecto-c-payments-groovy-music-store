@@ -2,8 +2,7 @@
 
 import { useRouter, usePathname, useSearchParams } from "next/navigation"
 import { useRef, useEffect, useState } from "react"
-
-const ESTADOS = ["pendiente", "pagado", "acreditado", "fallido", "reembolsado"] as const
+import { ESTADOS_TRANSACCION } from "@/lib/constants"
 
 export default function FiltrosVendedor() {
   const router      = useRouter()
@@ -54,7 +53,7 @@ export default function FiltrosVendedor() {
         className="px-3 py-2 rounded-md border border-border bg-card text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary"
       >
         <option value="">Todos los estados</option>
-        {ESTADOS.map((e) => <option key={e} value={e}>{e}</option>)}
+        {ESTADOS_TRANSACCION.map((e) => <option key={e} value={e}>{e}</option>)}
       </select>
       {hayFiltros && (
         <button
