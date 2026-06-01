@@ -1,17 +1,6 @@
 import { NextResponse } from "next/server"
-import { prisma } from "@/lib/prisma"
 import { getPayment } from "@/lib/mercadopago"
-
-// Mapeo de estados de MP a estados de nuestra app
-function mapearEstado(statusMP: string): string | null {
-  switch (statusMP) {
-    case "approved":   return "pagado"
-    case "rejected":   return "fallido"
-    case "pending":
-    case "in_process": return "pendiente"
-    default:           return null
-  }
-}
+import { confirmarPago } from "@/lib/confirmar-pago"
 
 export async function POST(request: Request) {
   try {
@@ -27,34 +16,30 @@ export async function POST(request: Request) {
       return NextResponse.json({ recibido: true }, { status: 200 })
     }
 
-    // Consultamos el pago completo a MP usando el ID
+    // Consultamos el pago UNA sola vez: nos da el external_reference (transaccion_id)
+    // y se reutiliza pasándoselo a confirmarPago para no llamar de nuevo a MP.
     const token = process.env.MP_ACCESS_TOKEN
     console.log(`Token presente: ${!!token}, primeros 10 chars: ${token?.slice(0, 10)}`)
 
-    const pagoMP = await getPayment().get({ id: String(paymentId) })
-
-    const statusMP      = pagoMP.status
+    const pagoMP        = await getPayment().get({ id: String(paymentId) })
     const transaccionId = pagoMP.external_reference
 
-    console.log(`Webhook recibido: paymentId=${paymentId} status=${statusMP} transaccionId=${transaccionId}`)
+    console.log(`Webhook recibido: paymentId=${paymentId} status=${pagoMP.status} transaccionId=${transaccionId}`)
 
-    if (!statusMP || !transaccionId) {
-      console.log("Webhook ignorado: falta statusMP o transaccionId")
+    if (!transaccionId) {
+      console.log("Webhook ignorado: falta transaccionId (external_reference)")
       return NextResponse.json({ recibido: true }, { status: 200 })
     }
 
-    const nuevoEstado = mapearEstado(statusMP)
-    if (!nuevoEstado) {
-      console.log(`Webhook ignorado: estado MP desconocido "${statusMP}"`)
+    // Toda la actualización de estado (transacción + pago) la hace confirmarPago.
+    const resultado = await confirmarPago(String(paymentId), transaccionId, pagoMP)
+
+    if (!resultado) {
+      console.log(`Webhook ignorado: estado MP no mapeable "${pagoMP.status}"`)
       return NextResponse.json({ recibido: true }, { status: 200 })
     }
 
-    await prisma.transaccion.update({
-      where: { id: transaccionId },
-      data:  { estado: nuevoEstado },
-    })
-
-    console.log(`Webhook OK: transaccion ${transaccionId} → ${nuevoEstado}`)
+    console.log(`Webhook OK: transaccion ${transaccionId} → ${resultado.estado}`)
 
     return NextResponse.json({ recibido: true }, { status: 200 })
 
