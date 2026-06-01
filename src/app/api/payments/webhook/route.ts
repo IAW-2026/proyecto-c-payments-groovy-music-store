@@ -30,7 +30,7 @@ export async function POST(request: Request) {
       const orden = await getMerchantOrder().get({ merchantOrderId: recursoId })
       const pagos = orden.payments ?? []
       // Tomamos el primer pago aprobado o el último disponible
-      cconst pagoAprobado = pagos.find((p) => p.status === "approved")
+      const pagoAprobado = pagos.find((p) => p.status === "approved")
                         ?? pagos[pagos.length - 1]
       paymentId = pagoAprobado?.id ? String(pagoAprobado.id) : null
     }
