@@ -26,6 +26,10 @@ export default function Buscador({ params, placeholder, estadoOpciones }: Props)
   const [mostrarAvanzados, setMostrarAvanzados] = useState(false)
 
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const searchInputId = `buscador-${params.query}`
+  const buyerInputId = `buscador-${params.buyerId}`
+  const sellerInputId = `buscador-${params.sellerId}`
+  const estadoSelectId = params.estado ? `buscador-${params.estado}` : undefined
 
   const actualizarURL = (cambios: Record<string, string>) => {
     if (!pathname) return
@@ -62,7 +66,11 @@ export default function Buscador({ params, placeholder, estadoOpciones }: Props)
   return (
     <div className="flex flex-col gap-3">
       <div className="flex gap-2">
+        <label htmlFor={searchInputId} className="sr-only">
+          Buscar
+        </label>
         <input
+          id={searchInputId}
           type="text"
           value={query}
           onChange={(e) => {
@@ -108,7 +116,11 @@ export default function Buscador({ params, placeholder, estadoOpciones }: Props)
 
       {mostrarAvanzados && (
         <div className="flex gap-2 flex-wrap">
+          <label htmlFor={buyerInputId} className="sr-only">
+            Buscar por buyer ID
+          </label>
           <input
+            id={buyerInputId}
             type="text"
             value={buyerId}
             onChange={(e) => {
@@ -118,7 +130,11 @@ export default function Buscador({ params, placeholder, estadoOpciones }: Props)
             placeholder="Buyer ID"
             className="flex-1 min-w-[150px] px-3 py-2 rounded-md border border-border bg-card text-foreground text-sm placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-primary"
           />
+          <label htmlFor={sellerInputId} className="sr-only">
+            Buscar por seller ID
+          </label>
           <input
+            id={sellerInputId}
             type="text"
             value={sellerId}
             onChange={(e) => {
@@ -130,7 +146,11 @@ export default function Buscador({ params, placeholder, estadoOpciones }: Props)
           />
           {params.estado && estadoOpciones && (
             <div className="relative">
+              <label htmlFor={estadoSelectId} className="sr-only">
+                Filtrar por estado
+              </label>
               <select
+                id={estadoSelectId}
                 value={estado}
                 onChange={(e) => {
                   setEstado(e.target.value)

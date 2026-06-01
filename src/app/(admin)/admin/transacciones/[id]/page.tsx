@@ -50,7 +50,7 @@ export default async function DetalleTransaccionPage({
             </h1>
             <p className="text-muted mt-1">Detalle completo y registros asociados.</p>
           </div>
-          <Link href="/admin/historial-transacciones" className="text-sm text-primary hover:underline">
+          <Link href="/admin/historial-transacciones" className="text-sm text-primary hover:underline" aria-label="Volver al historial de transacciones">
             ← Volver al historial
           </Link>
         </div>
@@ -97,13 +97,13 @@ export default async function DetalleTransaccionPage({
         {/* Pagos */}
         <section className="mb-6 bg-card rounded-lg border border-border overflow-hidden">
           <h2 className="text-lg font-semibold text-foreground p-6 pb-3">Pagos</h2>
-          <table className="w-full text-sm">
+          <table className="w-full text-sm text-center">
             <thead>
               <tr className="bg-secondary text-white">
-                <th scope="col" className="p-3 text-left">ID</th>
-                <th scope="col" className="p-3 text-left">Monto</th>
-                <th scope="col" className="p-3 text-left">Estado</th>
-                <th scope="col" className="p-3 text-left">Fecha</th>
+                <th scope="col" className="p-3">ID</th>
+                <th scope="col" className="p-3">Monto</th>
+                <th scope="col" className="p-3">Estado</th>
+                <th scope="col" className="p-3">Fecha</th>
               </tr>
             </thead>
             <tbody>
@@ -131,14 +131,14 @@ export default async function DetalleTransaccionPage({
         {/* Acreditaciones */}
         <section className="mb-6 bg-card rounded-lg border border-border overflow-hidden">
           <h2 className="text-lg font-semibold text-foreground p-6 pb-3">Acreditaciones</h2>
-          <table className="w-full text-sm">
+          <table className="w-full text-sm text-center">
             <thead>
               <tr className="bg-secondary text-white">
-                <th scope="col" className="p-3 text-left">ID</th>
-                <th scope="col" className="p-3 text-left">Seller ID</th>
-                <th scope="col" className="p-3 text-left">Monto</th>
-                <th scope="col" className="p-3 text-left">Estado</th>
-                <th scope="col" className="p-3 text-left">Fecha</th>
+                <th scope="col" className="p-3">ID</th>
+                <th scope="col" className="p-3">Seller ID</th>
+                <th scope="col" className="p-3">Monto</th>
+                <th scope="col" className="p-3">Estado</th>
+                <th scope="col" className="p-3">Fecha</th>
               </tr>
             </thead>
             <tbody>
@@ -162,14 +162,14 @@ export default async function DetalleTransaccionPage({
         {/* Reclamos */}
         <section className="bg-card rounded-lg border border-border overflow-hidden">
           <h2 className="text-lg font-semibold text-foreground p-6 pb-3">Reclamos</h2>
-          <table className="w-full text-sm">
+          <table className="w-full text-sm text-center">
             <thead>
               <tr className="bg-secondary text-white">
-                <th scope="col" className="p-3 text-left">ID</th>
-                <th scope="col" className="p-3 text-left">Motivo</th>
-                <th scope="col" className="p-3 text-left">Estado</th>
-                <th scope="col" className="p-3 text-left">Fecha Apertura</th>
-                <th scope="col" className="p-3 text-left">Acción</th>
+                <th scope="col" className="p-3">ID</th>
+                <th scope="col" className="p-3">Motivo</th>
+                <th scope="col" className="p-3">Estado</th>
+                <th scope="col" className="p-3">Fecha Apertura</th>
+                <th scope="col" className="p-3">Acción</th>
               </tr>
             </thead>
             <tbody>
@@ -186,6 +186,7 @@ export default async function DetalleTransaccionPage({
                       {r.estado === "abierto" ? (
                         <Link
                           href={`/admin/reclamos/${r.id}`}
+                          aria-label={`Resolver reclamo ${r.id}`}
                           className="px-3 py-1.5 rounded-md bg-primary text-white text-xs font-medium hover:bg-primary/90 transition-colors"
                         >
                           Resolver →

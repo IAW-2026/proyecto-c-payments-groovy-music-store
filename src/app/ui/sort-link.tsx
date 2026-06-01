@@ -51,6 +51,7 @@ export default function SortLink({
     <Link
       href={`?${params.toString()}`}
       scroll={false}
+      aria-label={`Ordenar por ${label}${isActive ? `, orden actual ${currentSortDir === "desc" ? "descendente" : "ascendente"}` : ""}`}
       className={`inline-flex items-center gap-1 whitespace-nowrap transition-opacity hover:opacity-75 ${
         isActive ? "text-primary" : ""
       }`}

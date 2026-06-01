@@ -22,12 +22,14 @@ export default function RootLayout({
         className={`${cormorant.variable} ${syne.variable} ${dmSans.variable} h-full`}
       >
         <body className="min-h-full flex flex-col bg-background text-foreground">
-          <nav className="bg-primary px-8 py-4 flex items-center justify-between">
-            <Link href="/" className="text-background font-bold text-lg hover:text-white/80 transition-colors">
-              Groovy Payments
-            </Link>
-            <NavButtons />
-          </nav>
+          <header>
+            <nav className="bg-primary px-8 py-4 flex items-center justify-between">
+              <Link href="/" className="text-background font-bold text-lg hover:text-white/80 transition-colors">
+                Groovy Payments
+              </Link>
+              <NavButtons />
+            </nav>
+          </header>
           {children}
           <footer className="bg-primary px-8 py-4 text-center text-background text-sm mt-auto">
             Groovy Music Store © 2026

@@ -50,7 +50,7 @@ export default async function VendedoresPage() {
               Balance de fondos por vendedor.
             </p>
           </div>
-          <Link href="/admin" className="text-sm text-primary hover:underline">
+          <Link href="/admin" className="text-sm text-primary hover:underline" aria-label="Volver al panel de administración">
             ← Volver al panel
           </Link>
         </div>
@@ -60,14 +60,14 @@ export default async function VendedoresPage() {
         </p>
 
         <div className="bg-card rounded-lg border border-border overflow-hidden">
-          <table className="w-full text-sm">
+          <table className="w-full text-sm text-center">
             <thead>
               <tr className="bg-secondary text-white">
-                <th scope="col" className="p-3 text-left">Seller ID</th>
-                <th scope="col" className="p-3 text-left">Retenido</th>
-                <th scope="col" className="p-3 text-left">Acreditado</th>
-                <th scope="col" className="p-3 text-left">Transacciones</th>
-                <th scope="col" className="p-3 text-left">Acción</th>
+                <th scope="col" className="p-3">Seller ID</th>
+                <th scope="col" className="p-3">Retenido</th>
+                <th scope="col" className="p-3">Acreditado</th>
+                <th scope="col" className="p-3">Transacciones</th>
+                <th scope="col" className="p-3">Acción</th>
               </tr>
             </thead>
             <tbody>
@@ -83,10 +83,11 @@ export default async function VendedoresPage() {
                     <td className="p-3 text-muted font-mono text-xs">{v.seller_id}</td>
                     <td className="p-3 text-foreground font-medium">{formatCurrency(v.retenido)}</td>
                     <td className="p-3 text-foreground font-medium">{formatCurrency(v.acreditado)}</td>
-                    <td className="p-3 text-muted">{v.transacciones}</td>
+                    <td className="p-3 text-muted text-center">{v.transacciones}</td>
                     <td className="p-3">
                       <Link
                         href={`/admin/vendedores/${v.seller_id}`}
+                        aria-label={`Ver detalle del vendedor ${v.seller_id}`}
                         className="px-3 py-1.5 rounded-md bg-primary text-white text-xs font-medium hover:bg-primary/90 transition-colors"
                       >
                         Ver detalle →
