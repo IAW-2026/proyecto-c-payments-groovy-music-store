@@ -2,6 +2,7 @@ import { notFound } from "next/navigation"
 import Link from "next/link"
 import { prisma } from "@/lib/prisma"
 import { getLabelMotivo } from "@/lib/motivos-reclamo"
+import BotonAcreditar from "./boton-acreditar"
 
 export default async function DetalleTransaccionPage({
   params,
@@ -121,6 +122,11 @@ export default async function DetalleTransaccionPage({
             </tbody>
           </table>
         </section>
+
+        {/* Acción: acreditar monto al vendedor */}
+        {transaccion.estado === "pagado" && (
+          <BotonAcreditar transaccionId={transaccion.id} />
+        )}
 
         {/* Acreditaciones */}
         <section className="mb-6 bg-card rounded-lg border border-border overflow-hidden">

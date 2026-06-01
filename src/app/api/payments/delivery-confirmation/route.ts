@@ -32,10 +32,21 @@ export async function POST(request: Request) {
       )
     }
 
-    const actualizada = await prisma.transaccion.update({
-      where: { id: transaccion_id },
-      data:  { estado: "acreditado" },
-    })
+    // Pasamos la transacción a acreditado y registramos la acreditación, atómico.
+    const [actualizada] = await prisma.$transaction([
+      prisma.transaccion.update({
+        where: { id: transaccion_id },
+        data:  { estado: "acreditado" },
+      }),
+      prisma.acreditacion.create({
+        data: {
+          transaccion_id: transaccion_id,
+          seller_id:      transaccion.seller_id,
+          monto:          transaccion.monto_acreditar,
+          estado:         "acreditado",
+        },
+      }),
+    ])
 
     return NextResponse.json({
       transaccion_id: actualizada.id,

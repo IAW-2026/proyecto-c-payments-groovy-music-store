@@ -25,6 +25,15 @@ export async function POST(request: Request) {
         monto_total,
         monto_acreditar: monto_total - (costoEnvio ?? 0),
         estado: "pendiente",
+        // El pago se registra junto con la transacción (nested write atómico).
+        // Toma el id de la transacción automáticamente.
+        pagos: {
+          create: {
+            buyer_id,
+            monto: monto_total,
+            estado: "pendiente",
+          },
+        },
       },
     })
 
