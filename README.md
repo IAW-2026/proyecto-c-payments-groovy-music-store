@@ -4,7 +4,7 @@ App de pagos del marketplace de música **Groovy Music Store**.
 Gestiona transacciones entre compradores y vendedores: procesamiento vía Mercado Pago Checkout Pro, retención y acreditación de fondos por vendedor, y resolución de reclamos con reembolsos totales y parciales.
 
 ## Deploy:
-https://proyecto-c-payments-groovy-music-store-7v6w3vx6k.vercel.app
+https://proyecto-c-payments-groovy-music-st.vercel.app/
 
 ## Acceso al panel de administración
 
