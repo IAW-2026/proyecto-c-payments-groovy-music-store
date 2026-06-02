@@ -2,7 +2,6 @@ import Link from "next/link"
 import { prisma } from "@/lib/prisma"
 
 export default async function VendedoresPage() {
-  // 2. Tres agregaciones en paralelo
   const [retenidos, acreditados, conteos] = await Promise.all([
     prisma.transaccion.groupBy({
       by: ["seller_id"],
@@ -20,7 +19,6 @@ export default async function VendedoresPage() {
     }),
   ])
 
-  // 3. Convertir los arrays de balances en Maps para búsqueda rápida
   const mapaRetenido = new Map(
     retenidos.map((r) => [r.seller_id, r._sum.monto_acreditar ?? 0])
   )
@@ -28,7 +26,6 @@ export default async function VendedoresPage() {
     acreditados.map((a) => [a.seller_id, a._sum.monto_acreditar ?? 0])
   )
 
-  // 4. Construir la lista final a partir de los conteos (que incluye a todos los sellers)
   const vendedores = conteos.map((c) => ({
     seller_id:    c.seller_id,
     transacciones: c._count.id,

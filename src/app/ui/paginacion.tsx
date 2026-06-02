@@ -1,6 +1,5 @@
 "use client"
 
-import React from "react"
 import { useRouter, usePathname, useSearchParams } from "next/navigation"
 
 type PaginacionProps = {

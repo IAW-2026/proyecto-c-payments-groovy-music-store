@@ -36,31 +36,22 @@ export async function POST(request: Request) {
     }
 
     if (!paymentId) {
-      console.log(`Webhook ignorado: tipo=${tipo}, sin paymentId resoluble`)
       return NextResponse.json({ recibido: true }, { status: 200 })
     }
-
-    const token = process.env.MP_ACCESS_TOKEN
-    console.log(`Token presente: ${!!token}, primeros 10 chars: ${token?.slice(0, 10)}`)
 
     const pagoMP        = await getPayment().get({ id: paymentId })
     const transaccionId = pagoMP.external_reference
 
-    console.log(`Webhook: paymentId=${paymentId} status=${pagoMP.status} transaccionId=${transaccionId}`)
-
     if (!transaccionId) {
-      console.log("Webhook ignorado: falta external_reference")
       return NextResponse.json({ recibido: true }, { status: 200 })
     }
 
     const resultado = await confirmarPago(paymentId, transaccionId, pagoMP)
 
     if (!resultado) {
-      console.log(`Webhook ignorado: estado MP no mapeable "${pagoMP.status}"`)
       return NextResponse.json({ recibido: true }, { status: 200 })
     }
 
-    console.log(`Webhook OK: transaccion ${transaccionId} → ${resultado.estado}`)
     return NextResponse.json({ recibido: true }, { status: 200 })
 
   } catch (error) {

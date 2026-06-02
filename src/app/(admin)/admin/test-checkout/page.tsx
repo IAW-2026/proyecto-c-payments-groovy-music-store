@@ -50,7 +50,7 @@ export default function TestCheckoutPage() {
       }
 
       setResultado(data)
-    } catch (e) {
+    } catch {
       setError("Error de red al llamar al endpoint")
     } finally {
       setCargando(false)

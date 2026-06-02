@@ -9,10 +9,8 @@ export default async function DetalleTransaccionPage({
 }: {
   params: Promise<{ id: string }>
 }) {
-  // 2. Leer el id de la ruta
   const { id } = await params
 
-  // 3. Traer la transacción con TODO lo relacionado en una sola query
   const transaccion = await prisma.transaccion.findUnique({
     where: { id },
     include: {
@@ -22,7 +20,6 @@ export default async function DetalleTransaccionPage({
     },
   })
 
-  // 4. Si no existe, 404
   if (!transaccion) notFound()
 
   const formatCurrency = (value: number) =>
@@ -31,7 +28,6 @@ export default async function DetalleTransaccionPage({
   const formatDate = (fecha: Date) =>
     new Date(fecha).toLocaleDateString("es-AR")
 
-  // Helper para el color del badge de estado de transacción
   const estiloEstado = (estado: string) =>
     estado === "pagado"      ? "bg-primary text-white"       :
     estado === "acreditado"  ? "bg-muted text-white"         :

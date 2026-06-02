@@ -23,7 +23,6 @@ export const MOTIVOS_RECLAMO = [
 
 export type ClaveMotivo = typeof MOTIVOS_RECLAMO[number]["clave"]
 
-// Helper: dada una clave, devuelve el label legible
 export function getLabelMotivo(clave: string): string {
   return MOTIVOS_RECLAMO.find((m) => m.clave === clave)?.label ?? clave
 }

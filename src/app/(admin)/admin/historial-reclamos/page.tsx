@@ -58,7 +58,7 @@ export default async function HistorialReclamosPage({
     prisma.reclamo.count({ where }),
   ])
 
-  // Resolver nombres de usuario para los buyer/seller de esta página (fallback al ID).
+  // Resolver nombres de usuario para los buyer/seller de esta página (fallback al ID)
   const nombres = await getNombresUsuarios(
     reclamos.flatMap((r) => [r.transaccion.buyer_id, r.transaccion.seller_id])
   )

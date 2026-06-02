@@ -24,7 +24,7 @@ async function main() {
     map.set(r.order_id, arr)
   }
 
-  const duplicates = [...map.entries()].filter(([_, arr]) => arr.length > 1)
+  const duplicates = [...map.entries()].filter(([, arr]) => arr.length > 1)
   if (duplicates.length === 0) {
     console.log("No se encontraron duplicados por order_id.")
     return
