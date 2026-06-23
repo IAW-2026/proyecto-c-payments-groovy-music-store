@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { verifyToken } from "@clerk/backend";
+import { verifyToken } from "@clerk/nextjs/server";
 import jwt from "jsonwebtoken";
 
 // Un request a Payments puede venir de dos mundos distintos:
