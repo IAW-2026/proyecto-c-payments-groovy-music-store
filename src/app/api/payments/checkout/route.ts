@@ -1,33 +1,36 @@
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { getPreference } from "@/lib/mercadopago"
 import { ESTADOS_PAGO, COMISION_PLATAFORMA } from "@/lib/constants"
+import { requiereAuth } from "@/lib/auth-interservicios"
+import { errorContrato } from "@/lib/error-contrato"
+import { estadoAContrato } from "@/lib/mapeo-contrato"
 
 const [PAGO_PENDIENTE] = ESTADOS_PAGO
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
+  const auth = await requiereAuth(request)
+  if ("error" in auth) {
+    return NextResponse.json(auth.error, { status: auth.status })
+  }
+
   try {
-    // datos que llegan de la buyer app
     const body = await request.json()
     const { order_id, buyer_id, seller_id, costoEnvio, monto_total } = body
 
-    // validacion server-side
     if (!order_id || !buyer_id || !seller_id || monto_total == null) {
-      return NextResponse.json(
-        { error: "Faltan datos obligatorios" },
-        { status: 400 }
+      return errorContrato(
+        "solicitud_invalida",
+        "Faltan datos obligatorios: order_id, buyer_id, seller_id y monto_total son requeridos",
+        400
       )
     }
 
-    // monto_total YA incluye el envío. La comisión es 15% sobre el producto
-    // (producto = monto_total - costoEnvio). Identidad contable que siempre vale:
-    //   monto_total = costoEnvio + comision + monto_acreditar
-    const envio           = costoEnvio ?? 0
-    const producto        = monto_total - envio
-    const comision        = producto * COMISION_PLATAFORMA
+    const envio = costoEnvio ?? 0
+    const producto = monto_total - envio
+    const comision = producto * COMISION_PLATAFORMA
     const monto_acreditar = producto * (1 - COMISION_PLATAFORMA)
 
-    // creamos la transaccion en la base de datos
     const transaccion = await prisma.transaccion.create({
       data: {
         order_id,
@@ -38,8 +41,6 @@ export async function POST(request: Request) {
         comision,
         monto_acreditar,
         estado: "pendiente",
-        // El pago se registra junto con la transacción (nested write atómico).
-        // Toma el id de la transacción automáticamente.
         pagos: {
           create: {
             buyer_id,
@@ -50,15 +51,13 @@ export async function POST(request: Request) {
       },
     })
 
-    // creamos preferencia en mp
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL?.replace(/\/$/, "")
 
     if (!baseUrl) {
-      throw new Error("NEXT_PUBLIC_BASE_URL no está configurado")
+      return errorContrato("error_interno", "NEXT_PUBLIC_BASE_URL no está configurado", 500)
     }
 
-    const esLocal = baseUrl.includes("localhost") 
-    // Para que no retorne el approved en local, no se puede redirigir a localhost desde mp
+    const esLocal = baseUrl.includes("localhost")
 
     const resultado = await getPreference().create({
       body: {
@@ -82,16 +81,15 @@ export async function POST(request: Request) {
       },
     })
 
-    //devuelvo url a buyerapp
+    // Nombres de campo según 03-apis.md: pagoId, urlCheckout, estado
     return NextResponse.json({
-      transaccion_id: transaccion.id,
-      init_point: resultado.init_point,
+      pagoId: transaccion.id,
+      urlCheckout: resultado.init_point,
+      estado: estadoAContrato(transaccion.estado),
     })
+
   } catch (error) {
-    console.error("Error en /checkout:", error) 
-    return NextResponse.json(
-      { error: "Error al crear el pago" },
-      { status: 500 }
-    )
+    console.error("Error en /checkout:", error)
+    return errorContrato("error_interno", "Error al crear el pago", 500)
   }
 }
