@@ -70,7 +70,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       datos,
       paginacion: {
-        página: pagina,
+        pagina: pagina,
         limite,
         total,
         totalPaginas: Math.max(1, Math.ceil(total / limite)),
