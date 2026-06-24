@@ -69,13 +69,13 @@ export async function GET(request: NextRequest) {
             sellerId: tx.seller_id,
             monto: tx.monto_total,
             estado: estadoAContrato(tx.estado),
-            fecha: tx.fecha.toISOString(),
+            creadoEn: tx.fecha.toISOString(),
         }))
 
         return NextResponse.json({
             datos,
             paginacion: {
-                página: pagina,
+                pagina: pagina,
                 limite,
                 total,
                 totalPaginas: Math.ceil(total / limite),
