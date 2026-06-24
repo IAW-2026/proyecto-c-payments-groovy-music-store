@@ -59,6 +59,8 @@ export async function POST(request: NextRequest) {
 
     const esLocal = baseUrl.includes("localhost")
 
+    const paginaEstadoOrden = `${process.env.BUYER_API_URL}/checkout/estado-orden/${encodeURIComponent(order_id)}`
+
     const resultado = await getPreference().create({
       body: {
         items: [
@@ -71,9 +73,9 @@ export async function POST(request: NextRequest) {
           },
         ],
         back_urls: {
-          success: `${baseUrl}/pago/exitoso`,
-          failure: `${baseUrl}/pago/fallido`,
-          pending: `${baseUrl}/pago/pendiente`,
+          success: paginaEstadoOrden,
+          failure: paginaEstadoOrden,
+          pending: paginaEstadoOrden,
         },
         ...(esLocal ? {} : { auto_return: "approved" }),
         external_reference: String(transaccion.id),
