@@ -1,9 +1,10 @@
 import jwt from "jsonwebtoken";
+import { EstadoContrato } from "@/lib/mapeo-contrato"
 
 interface NotificacionPago {
     ordenId: string;             // id de la orden en Buyer (la guardaste vos en el checkout)
     pagoId: string;               // id de tu transacción en Payments
-    estado: "aprobado" | "rechazado" | "pendiente"; // ya en vocabulario de contrato — ver nota abajo
+    estado: EstadoContrato; // ya en vocabulario de contrato — ver nota abajo
     fechaActualizacion: string;  // ISO 8601
 }
 

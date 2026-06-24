@@ -17,7 +17,10 @@ const [
  *   Buyer, el pago está aprobado en los dos casos. Que los fondos ya estén
  *   liberados al vendedor (acreditado) es información interna de Payments.
  */
-export function estadoAContrato(estadoInterno: string): string {
+
+export type EstadoContrato = "pendiente" | "aprobado" | "rechazado" | "reembolsado"
+
+export function estadoAContrato(estadoInterno: string): EstadoContrato {
     switch (estadoInterno) {
         case TX_PENDIENTE: return "pendiente"
         case TX_PAGADO: return "aprobado"
@@ -28,6 +31,6 @@ export function estadoAContrato(estadoInterno: string): string {
             // Estado no contemplado: lo devolvemos tal cual en vez de mentir con
             // "pendiente". Si esto aparece, es señal de que falta un case acá.
             console.warn(`[estadoAContrato] estado interno no mapeado: '${estadoInterno}'`)
-            return estadoInterno
+            return "pendiente"
     }
 }
