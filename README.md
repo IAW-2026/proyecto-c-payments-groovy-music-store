@@ -1,6 +1,6 @@
 # Payments App — Groovy Music Store
 
-Marketplace de música física (Tipo C). Esta app es responsable de los pagos: inicia el checkout vía Mercado Pago, registra transacciones y acreditaciones a vendedores, gestiona reclamos/reembolsos, y expone analítica de su dominio al resto del ecosistema (Buyer, Seller, Shipping y Control Plane).
+Marketplace de música física (Tipo C). Esta app es responsable de los pagos: inicia el checkout vía Mercado Pago, registra transacciones y acreditaciones a vendedores, gestiona reclamos/reembolsos, y expone analítica de su dominio al resto del ecosistema (Buyer, Seller, Shipping, Control Plane y Analytics).
 
 ## Stack
 
@@ -12,15 +12,11 @@ Next.js (App Router, TypeScript) · Prisma 6 · PostgreSQL (Neon) · Clerk (auth
 
 ## Acceso — panel de administración
 
-El panel admin (`/admin`) requiere rol `admin_payments` en Clerk.
-
 | Usuario | Email | Contraseña |
 |---|---|---|
 | Admin | `adminpayments+clerktest@iaw.com` | `iawuser#` |
 
 *(Usuario Clerk de prueba: `adminpaymentsclerktest`)*
-
-Un usuario sin ese rol que intenta acceder es redirigido a `/no-autorizado`.
 
 ## Probar el flujo de pago (sandbox Mercado Pago)
 
