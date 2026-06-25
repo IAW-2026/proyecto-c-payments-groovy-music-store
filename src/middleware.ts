@@ -3,13 +3,17 @@ import { NextResponse } from "next/server"
 
 const isAdminRoute = createRouteMatcher(["/admin(.*)"])
 const isLandingRoute = createRouteMatcher(["/"])
+const isApiRoute = createRouteMatcher(["/api(.*)"])
 
 export default clerkMiddleware(async (auth, req) => {
+  if (isApiRoute(req)) {
+    return NextResponse.next()
+  }
+
   const { userId, sessionClaims, redirectToSignIn } = await auth()
   const roles = (sessionClaims?.roles as string[]) ?? []
   const isAdmin = roles.includes("admin_payments")
 
-  // Rutas del panel: requieren sesión y rol de admin.
   if (isAdminRoute(req)) {
     if (!userId) {
       return redirectToSignIn()
@@ -19,7 +23,6 @@ export default clerkMiddleware(async (auth, req) => {
     }
   }
 
-  // Usuario logueado sin permisos que cae en la landing → 403 inmediato.
   if (isLandingRoute(req) && userId && !isAdmin) {
     return NextResponse.redirect(new URL("/no-autorizado", req.url))
   }
