@@ -1,20 +1,19 @@
 import { NextResponse } from "next/server"
 import { getPayment, getMerchantOrder } from "@/lib/mercadopago"
 import { confirmarPago } from "@/lib/confirmar-pago"
+import { notificarPagoABuyer } from "@/lib/notificarBuyer"
+import { estadoAContrato } from "@/lib/mapeo-contrato"
 
 export async function POST(request: Request) {
   try {
-    // Leemos query params (formato IPN legacy)
-    const url    = new URL(request.url)
-    const topic  = url.searchParams.get("topic")
-    const idQP   = url.searchParams.get("id")
+    const url = new URL(request.url)
+    const topic = url.searchParams.get("topic")
+    const idQP = url.searchParams.get("id")
 
-    // Leemos body (formato nuevo de webhooks)
     let body: { type?: string; data?: { id?: string } } = {}
     try { body = await request.json() } catch { /* body vacío es válido */ }
 
-    // Unificamos: el tipo y el id pueden venir de cualquiera de los dos lugares
-    const tipo      = body.type ?? topic
+    const tipo = body.type ?? topic
     const recursoId = body.data?.id ?? idQP
 
     if (!recursoId) {
@@ -26,12 +25,10 @@ export async function POST(request: Request) {
     if (tipo === "payment") {
       paymentId = recursoId
     } else if (tipo === "merchant_order") {
-      // Consultamos la orden para extraer el payment_id
       const orden = await getMerchantOrder().get({ merchantOrderId: recursoId })
       const pagos = orden.payments ?? []
-      // Tomamos el primer pago aprobado o el último disponible
       const pagoAprobado = pagos.find((p) => p.status === "approved")
-                        ?? pagos[pagos.length - 1]
+        ?? pagos[pagos.length - 1]
       paymentId = pagoAprobado?.id ? String(pagoAprobado.id) : null
     }
 
@@ -39,7 +36,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ recibido: true }, { status: 200 })
     }
 
-    const pagoMP        = await getPayment().get({ id: paymentId })
+    const pagoMP = await getPayment().get({ id: paymentId })
     const transaccionId = pagoMP.external_reference
 
     if (!transaccionId) {
@@ -51,6 +48,16 @@ export async function POST(request: Request) {
     if (!resultado) {
       return NextResponse.json({ recibido: true }, { status: 200 })
     }
+
+    // Notificación a Buyer — fuera del try interno: si falla, ya sabemos
+    // que notificarPagoABuyer nunca tira excepción (lo vimos en su código),
+    // así que esto no pone en riesgo el 200 final.
+    await notificarPagoABuyer({
+      ordenId: resultado.order_id,
+      pagoId: transaccionId,
+      estado: estadoAContrato(resultado.estado),
+      fechaActualizacion: new Date().toISOString(),
+    })
 
     return NextResponse.json({ recibido: true }, { status: 200 })
 
