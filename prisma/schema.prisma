@@ -1,0 +1,61 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Transaccion {
+  id              String         @id @default(uuid())
+  order_id        String
+  buyer_id        String
+  seller_id       String
+  monto_total     Float
+  costoEnvio      Float          @default(0)
+  comision        Float          @default(0)
+  monto_acreditar Float
+  estado          String         @default("pendiente")
+  fecha           DateTime       @default(now())
+
+  pagos           Pago[]
+  acreditaciones  Acreditacion[]
+  reclamos        Reclamo[]
+}
+
+model Pago {
+  id             String      @id @default(uuid())
+  transaccion_id String
+  buyer_id       String
+  monto          Float
+  fecha          DateTime    @default(now())
+  estado         String      @default("pendiente")
+
+  transaccion    Transaccion @relation(fields: [transaccion_id], references: [id])
+}
+
+model Acreditacion {
+  id             String      @id @default(uuid())
+  transaccion_id String
+  seller_id      String
+  monto          Float
+  fecha          DateTime    @default(now())
+  estado         String      @default("pendiente")
+
+  transaccion    Transaccion @relation(fields: [transaccion_id], references: [id])
+}
+
+model Reclamo {
+  id                  String      @id @default(uuid())
+  transaccion_id      String
+  motivo              String
+  descripcion         String?
+  estado              String      @default("abierto")
+  fecha_apertura      DateTime    @default(now())
+  fecha_resolucion    DateTime?
+  monto_reembolso     Float?
+  evidencia_comprador String?
+
+  transaccion         Transaccion @relation(fields: [transaccion_id], references: [id])
+}

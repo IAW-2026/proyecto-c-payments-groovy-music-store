@@ -1,0 +1,210 @@
+import { Suspense } from "react"
+import Link from "next/link"
+import type { Prisma } from "@prisma/client"
+import { prisma } from "@/lib/prisma"
+import Paginacion from "@/app/ui/paginacion"
+import SortLink from "@/app/ui/sort-link"
+import FiltrosVendedor from "./filtros"
+import BotonAcreditarRetenidos from "./boton-acreditar-retenidos"
+import TablaReclamosVendedor from "./tabla-reclamos-vendedor"
+
+const POR_PAGINA = 20
+const CAMPOS_T = ["id", "order_id", "monto_total", "monto_acreditar", "estado", "fecha"]
+
+type SearchParams = {
+  query?: string
+  estado?: string
+  pagina?: string
+  sortBy?: string
+  sortDir?: string
+}
+
+export default async function DetalleVendedorPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ sellerId: string }>
+  searchParams: Promise<SearchParams>
+}) {
+  const { sellerId } = await params
+  const sp = await searchParams
+
+  const query   = sp.query?.trim()  ?? ""
+  const estado  = sp.estado?.trim() ?? ""
+  const pagina  = Math.max(1, parseInt(sp.pagina ?? "1", 10))
+  const sortBy  = sp.sortBy  ?? ""
+  const sortDir = sp.sortDir ?? ""
+
+  const where: Prisma.TransaccionWhereInput = { seller_id: sellerId }
+  if (query) {
+    where.OR = [
+      { id:       { contains: query, mode: "insensitive" } },
+      { order_id: { contains: query, mode: "insensitive" } },
+    ]
+  }
+  if (estado) where.estado = estado
+
+  const orderBy: Prisma.TransaccionOrderByWithRelationInput = CAMPOS_T.includes(sortBy)
+    ? { [sortBy]: sortDir === "asc" ? "asc" : "desc" } as Prisma.TransaccionOrderByWithRelationInput
+    : { fecha: "desc" }
+
+  const baseParams = sp as Record<string, string | undefined>
+
+  const [retenido, acreditado, transacciones, total, reclamos] = await Promise.all([
+    prisma.transaccion.aggregate({
+      where: { seller_id: sellerId, estado: "pagado" },
+      _sum: { monto_acreditar: true },
+    }),
+    prisma.transaccion.aggregate({
+      where: { seller_id: sellerId, estado: "acreditado" },
+      _sum: { monto_acreditar: true },
+    }),
+    prisma.transaccion.findMany({
+      where,
+      orderBy,
+      skip: (pagina - 1) * POR_PAGINA,
+      take: POR_PAGINA,
+    }),
+    prisma.transaccion.count({ where }),
+    // Los reclamos no tienen seller_id: se filtran a través de la transacción.
+    prisma.reclamo.findMany({
+      where: { transaccion: { seller_id: sellerId } },
+      orderBy: { fecha_apertura: "desc" },
+    }),
+  ])
+
+  const balanceRetenido   = retenido._sum.monto_acreditar   ?? 0
+  const balanceAcreditado = acreditado._sum.monto_acreditar ?? 0
+  const tieneMasPaginas   = pagina * POR_PAGINA < total
+  const hayFiltros        = query || estado
+
+  const formatCurrency = (value: number) =>
+    value.toLocaleString("es-AR", { style: "currency", currency: "ARS" })
+
+  return (
+    <main className="min-h-screen bg-background p-8">
+      <div className="max-w-6xl mx-auto">
+
+        <div className="mb-8 border-b border-border pb-4 flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-foreground">Vendedor</h1>
+            <p className="text-muted mt-1 font-mono text-sm">{sellerId}</p>
+          </div>
+          <Link href="/admin/vendedores" className="text-sm text-primary hover:underline" aria-label="Volver al listado de vendedores">
+            ← Volver a vendedores
+          </Link>
+        </div>
+
+        {/* Resumen de balances */}
+        <section className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+          <div className="bg-card rounded-lg border border-border p-4">
+            <p className="text-sm text-muted">Balance Retenido</p>
+            <p className="text-2xl font-semibold text-foreground mt-2">
+              {formatCurrency(balanceRetenido)}
+            </p>
+            <p className="text-xs text-muted mt-1">
+              Fondos de transacciones pagadas, pendientes de liberar.
+            </p>
+          </div>
+          <div className="bg-card rounded-lg border border-border p-4">
+            <p className="text-sm text-muted">Balance Acreditado</p>
+            <p className="text-2xl font-semibold text-foreground mt-2">
+              {formatCurrency(balanceAcreditado)}
+            </p>
+            <p className="text-xs text-muted mt-1">
+              Fondos ya liberados tras confirmar entrega.
+            </p>
+          </div>
+        </section>
+
+        {/* Acción: acreditar en lote los montos retenidos del vendedor */}
+        {balanceRetenido > 0 && (
+          <section className="mb-8">
+            <BotonAcreditarRetenidos sellerId={sellerId} />
+          </section>
+        )}
+
+        {/* Transacciones del vendedor */}
+        <section>
+          <h2 className="text-xl font-semibold text-foreground mb-4">Transacciones</h2>
+
+          <Suspense fallback={<div className="h-10 bg-card rounded-md border border-border animate-pulse mb-4" />}>
+            <FiltrosVendedor />
+          </Suspense>
+
+          <p className="text-sm text-muted mt-3 mb-3">
+            {hayFiltros
+              ? `${total} resultado${total !== 1 ? "s" : ""} encontrado${total !== 1 ? "s" : ""}`
+              : `${total} transacción${total !== 1 ? "es" : ""} en total`}
+          </p>
+
+          <div className="bg-card rounded-lg border border-border overflow-visible mb-6">
+            <table className="w-full text-sm text-center">
+              <thead>
+                <tr className="bg-secondary text-white">
+                  <th scope="col" className="p-3"><SortLink label="ID" sortKey="id" currentSortBy={sortBy} currentSortDir={sortDir} baseParams={baseParams} /></th>
+                  <th scope="col" className="p-3"><SortLink label="Order ID" sortKey="order_id" currentSortBy={sortBy} currentSortDir={sortDir} baseParams={baseParams} /></th>
+                  <th scope="col" className="p-3"><SortLink label="Monto Total" sortKey="monto_total" currentSortBy={sortBy} currentSortDir={sortDir} baseParams={baseParams} /></th>
+                  <th scope="col" className="p-3"><SortLink label="A Acreditar" sortKey="monto_acreditar" currentSortBy={sortBy} currentSortDir={sortDir} baseParams={baseParams} /></th>
+                  <th scope="col" className="p-3"><SortLink label="Estado" sortKey="estado" currentSortBy={sortBy} currentSortDir={sortDir} baseParams={baseParams} /></th>
+                  <th scope="col" className="p-3"><SortLink label="Fecha" sortKey="fecha" currentSortBy={sortBy} currentSortDir={sortDir} baseParams={baseParams} /></th>
+                </tr>
+              </thead>
+              <tbody>
+                {transacciones.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="p-4 text-center text-muted">
+                      {hayFiltros
+                        ? "No se encontraron transacciones con esos filtros."
+                        : "Este vendedor no tiene transacciones."}
+                    </td>
+                  </tr>
+                ) : (
+                  transacciones.map((t, i) => (
+                    <tr key={t.id} className={`group ${i % 2 === 0 ? "bg-card" : "bg-background"} hover:bg-primary/15`}>
+                      <td className="p-3 text-muted font-mono text-xs">#{t.id}</td>
+                      <td className="p-3 text-muted font-mono text-xs">#{t.order_id}</td>
+                      <td className="p-3 text-foreground font-medium">{formatCurrency(t.monto_total)}</td>
+                      <td className="p-3 text-foreground">{formatCurrency(t.monto_acreditar)}</td>
+                      <td className="p-3">
+                        <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                          t.estado === "pagado"      ? "bg-primary text-white"       :
+                          t.estado === "acreditado"  ? "bg-muted text-white"         :
+                          t.estado === "fallido"     ? "bg-red-100 text-red-700"     :
+                          t.estado === "reembolsado" ? "bg-amber-100 text-amber-700" :
+                          "bg-border text-foreground"
+                        }`}>
+                          {t.estado}
+                        </span>
+                      </td>
+                      <td className="p-3 pr-6 text-muted relative">
+                        {new Date(t.fecha).toLocaleDateString("es-AR")}
+                        <Link
+                          href={`/admin/transacciones/${t.id}`}
+                          aria-label={`Ver detalle de la transacción ${t.id}`}
+                          className="absolute right-0 top-1/2 translate-x-1/2 -translate-y-1/2 z-10 px-3 py-1 rounded text-xs font-semibold bg-primary text-white shadow-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap"
+                        >
+                          →
+                        </Link>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {total > POR_PAGINA && (
+            <Paginacion paginaActual={pagina} tieneMasPaginas={tieneMasPaginas} />
+          )}
+        </section>
+
+        {/* Reclamos del vendedor (filtrados vía la transacción asociada) */}
+        <section className="mt-10">
+          <h2 className="text-xl font-semibold text-foreground mb-4">Reclamos</h2>
+          <TablaReclamosVendedor reclamos={reclamos} />
+        </section>
+      </div>
+    </main>
+  )
+}
